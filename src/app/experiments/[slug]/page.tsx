@@ -1,39 +1,9 @@
-import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import {
-  ArrowLeft,
-  ArrowUpRight,
-  Github,
-  ExternalLink,
-  Clock,
-  Sparkles,
-} from "lucide-react";
-import { useEffect } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, ArrowUpRight, Github, ExternalLink, Clock, Sparkles } from "lucide-react";
 import { experiments, getExperimentBySlug, type Experiment } from "@/data/experiments";
-import { reportLovableError } from "@/lib/lovable-error-reporting";
-
-export const Route = createFileRoute("/experiments/$slug")({
-  loader: ({ params }) => {
-    const exp = getExperimentBySlug(params.slug);
-    if (!exp) throw notFound();
-    return exp;
-  },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.title} — Viggy's AI Lab` },
-          { name: "description", content: loaderData.description },
-          { property: "og:title", content: `${loaderData.title} — Viggy's AI Lab` },
-          { property: "og:description", content: loaderData.description },
-          { property: "og:image", content: loaderData.image },
-          { name: "twitter:image", content: loaderData.image },
-        ]
-      : [],
-  }),
-  component: ExperimentDetail,
-  notFoundComponent: NotFound,
-  errorComponent: ErrorView,
-});
+import { FadeIn } from "@/components/lab/FadeIn";
 
 const STATUS_STYLES = {
   Live: "bg-emerald-400/15 text-emerald-300 border-emerald-400/30",
@@ -41,8 +11,40 @@ const STATUS_STYLES = {
   Archived: "bg-zinc-400/15 text-zinc-300 border-zinc-400/30",
 } as const;
 
-function ExperimentDetail() {
-  const exp = Route.useLoaderData() as Experiment;
+export function generateStaticParams() {
+  return experiments.map((e) => ({ slug: e.slug }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const exp = getExperimentBySlug(slug);
+  if (!exp) return {};
+  return {
+    title: `${exp.title} — Viggy's AI Lab`,
+    description: exp.description,
+    openGraph: {
+      title: `${exp.title} — Viggy's AI Lab`,
+      description: exp.description,
+      images: [exp.image],
+    },
+    twitter: {
+      images: [exp.image],
+    },
+  };
+}
+
+export default async function ExperimentDetail({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const exp: Experiment | undefined = getExperimentBySlug(slug);
+  if (!exp) notFound();
 
   const idx = experiments.findIndex((e) => e.slug === exp.slug);
   const prev = idx > 0 ? experiments[idx - 1] : undefined;
@@ -51,7 +53,7 @@ function ExperimentDetail() {
   return (
     <main className="mx-auto max-w-4xl px-4 pt-8 pb-16 sm:px-6">
       <Link
-        to="/"
+        href="/"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
@@ -59,13 +61,9 @@ function ExperimentDetail() {
       </Link>
 
       {/* Hero */}
-      <motion.section
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="overflow-hidden rounded-3xl border border-border/60 glass card-glow"
-      >
+      <FadeIn className="overflow-hidden rounded-3xl border border-border/60 glass card-glow">
         <div className="relative aspect-[16/9] overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={exp.image}
             alt={exp.title}
@@ -96,9 +94,7 @@ function ExperimentDetail() {
             <h1 className="font-display text-3xl font-semibold leading-tight sm:text-5xl">
               {exp.title}
             </h1>
-            <p className="mt-3 max-w-2xl text-base text-foreground/80">
-              {exp.description}
-            </p>
+            <p className="mt-3 max-w-2xl text-base text-foreground/80">{exp.description}</p>
           </div>
         </div>
 
@@ -128,7 +124,7 @@ function ExperimentDetail() {
             Built in {exp.buildTime}
           </span>
         </div>
-      </motion.section>
+      </FadeIn>
 
       {/* Content */}
       <div className="mt-10 grid grid-cols-1 gap-10 md:grid-cols-3">
@@ -144,6 +140,7 @@ function ExperimentDetail() {
             <Section title="Screenshots">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {exp.screenshots.map((s, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     key={i}
                     src={s}
@@ -223,8 +220,7 @@ function ExperimentDetail() {
               {exp.tags.map((t) => (
                 <Link
                   key={t}
-                  to="/"
-                  search={{ q: "", tag: t, status: "All" }}
+                  href={`/?tag=${encodeURIComponent(t)}&status=All`}
                   className="rounded-full border border-border/60 bg-background/40 px-2 py-0.5 text-xs text-muted-foreground hover:text-foreground"
                 >
                   #{t}
@@ -239,8 +235,7 @@ function ExperimentDetail() {
       <nav className="mt-14 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {prev ? (
           <Link
-            to="/experiments/$slug"
-            params={{ slug: prev.slug }}
+            href={`/experiments/${prev.slug}`}
             className="group glass rounded-2xl border border-border/60 p-4 transition-colors hover:bg-background/40"
           >
             <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -248,11 +243,12 @@ function ExperimentDetail() {
             </div>
             <div className="mt-1 font-display text-base font-medium">{prev.title}</div>
           </Link>
-        ) : <span />}
+        ) : (
+          <span />
+        )}
         {next ? (
           <Link
-            to="/experiments/$slug"
-            params={{ slug: next.slug }}
+            href={`/experiments/${next.slug}`}
             className="group glass rounded-2xl border border-border/60 p-4 text-right transition-colors hover:bg-background/40"
           >
             <div className="text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -262,7 +258,9 @@ function ExperimentDetail() {
               {next.title} <ArrowUpRight className="h-4 w-4" />
             </div>
           </Link>
-        ) : <span />}
+        ) : (
+          <span />
+        )}
       </nav>
     </main>
   );
@@ -272,9 +270,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <section>
       <h2 className="mb-3 font-display text-xl font-semibold">{title}</h2>
-      <div className="space-y-3 text-[15px] leading-relaxed text-foreground/85">
-        {children}
-      </div>
+      <div className="space-y-3 text-[15px] leading-relaxed text-foreground/85">{children}</div>
     </section>
   );
 }
@@ -287,44 +283,5 @@ function SidebarBlock({ title, children }: { title: string; children: React.Reac
       </h3>
       {children}
     </div>
-  );
-}
-
-function NotFound() {
-  return (
-    <main className="mx-auto max-w-md px-6 py-24 text-center">
-      <h1 className="font-display text-4xl font-semibold text-gradient">Not found</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        That experiment hasn't been shipped yet.
-      </p>
-      <Link
-        to="/"
-        className="mt-6 inline-flex rounded-lg bg-gradient-to-r from-[var(--violet-glow)] to-[var(--cyan-glow)] px-4 py-2 text-sm font-medium text-background"
-      >
-        Back to the lab
-      </Link>
-    </main>
-  );
-}
-
-function ErrorView({ error, reset }: { error: Error; reset: () => void }) {
-  const router = useRouter();
-  useEffect(() => {
-    reportLovableError(error, { boundary: "experiment_detail" });
-  }, [error]);
-  return (
-    <main className="mx-auto max-w-md px-6 py-24 text-center">
-      <h1 className="font-display text-2xl font-semibold">Something broke</h1>
-      <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
-      <button
-        onClick={() => {
-          router.invalidate();
-          reset();
-        }}
-        className="mt-6 rounded-lg bg-gradient-to-r from-[var(--violet-glow)] to-[var(--cyan-glow)] px-4 py-2 text-sm font-medium text-background"
-      >
-        Try again
-      </button>
-    </main>
   );
 }

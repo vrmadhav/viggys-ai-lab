@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { Github, Mail, Sparkles } from "lucide-react";
 import { site } from "@/data/site";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 glass border-b border-border/60">
       <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4 sm:px-6">
-        <Link to="/" className="group flex items-center gap-2">
+        <Link href="/" className="group flex items-center gap-2">
           <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--violet-glow)] to-[var(--cyan-glow)] shadow-[0_8px_30px_-10px_var(--violet-glow)]">
             <Sparkles className="h-3.5 w-3.5 text-background" />
           </span>

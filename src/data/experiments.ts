@@ -1,9 +1,10 @@
-import dailyArtist from "@/assets/experiments/daily-artist.jpg";
-import breweryAgent from "@/assets/experiments/brewery-marketing-agent.jpg";
-import creativeCanvas from "@/assets/experiments/creative-canvas.jpg";
-import calisthenicsCoach from "@/assets/experiments/ai-calisthenics-coach.jpg";
-import worldCup from "@/assets/experiments/world-cup-match-explorer.jpg";
-import brandBrain from "@/assets/experiments/brand-brain-prototype.jpg";
+// Images live in /public/experiments and are referenced by absolute path.
+const dailyArtist = "/experiments/daily-artist.jpg";
+const breweryAgent = "/experiments/brewery-marketing-agent.jpg";
+const creativeCanvas = "/experiments/creative-canvas.jpg";
+const calisthenicsCoach = "/experiments/ai-calisthenics-coach.jpg";
+const worldCup = "/experiments/world-cup-match-explorer.jpg";
+const brandBrain = "/experiments/brand-brain-prototype.jpg";
 
 export type ExperimentStatus = "Live" | "In Progress" | "Archived";
 

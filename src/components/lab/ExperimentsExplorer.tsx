@@ -1,6 +1,8 @@
+"use client";
+
 import { useMemo } from "react";
 import { Search, X } from "lucide-react";
-import { useNavigate } from "@tanstack/react-router";
+import { useRouter } from "next/navigation";
 import { experiments, type ExperimentStatus } from "@/data/experiments";
 import { ExperimentCard } from "./ExperimentCard";
 
@@ -10,11 +12,10 @@ type Props = {
   q: string;
   tag: string;
   status: string;
-  from: "/" | "/experiments";
 };
 
-export function ExperimentsExplorer({ q, tag, status, from }: Props) {
-  const navigate = useNavigate({ from });
+export function ExperimentsExplorer({ q, tag, status }: Props) {
+  const router = useRouter();
 
   const allTags = useMemo(
     () => Array.from(new Set(experiments.flatMap((e) => e.tags))).sort(),
@@ -35,12 +36,13 @@ export function ExperimentsExplorer({ q, tag, status, from }: Props) {
   }, [q, tag, status]);
 
   const setSearch = (next: Partial<{ q: string; tag: string; status: string }>) => {
-    navigate({
-      search: (prev: Record<string, unknown>) => ({
-        ...prev,
-        ...next,
-      }),
-    } as never);
+    const merged = { q, tag, status, ...next };
+    const params = new URLSearchParams();
+    if (merged.q) params.set("q", merged.q);
+    if (merged.tag) params.set("tag", merged.tag);
+    if (merged.status && merged.status !== "All") params.set("status", merged.status);
+    const qs = params.toString();
+    router.push(qs ? `/?${qs}` : "/", { scroll: false });
   };
 
   const hasFilters = q || (tag && tag.length > 0) || (status && status !== "All");

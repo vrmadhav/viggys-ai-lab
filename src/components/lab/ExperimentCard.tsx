@@ -1,5 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Experiment } from "@/data/experiments";
 
@@ -17,11 +19,11 @@ export function ExperimentCard({ experiment }: { experiment: Experiment }) {
       className="group relative"
     >
       <Link
-        to="/experiments/$slug"
-        params={{ slug: experiment.slug }}
+        href={`/experiments/${experiment.slug}`}
         className="block overflow-hidden rounded-2xl border border-border/60 glass transition-shadow duration-300 group-hover:shadow-[0_30px_80px_-30px_var(--violet-glow)]"
       >
         <div className="relative aspect-[4/3] overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={experiment.image}
             alt={experiment.title}

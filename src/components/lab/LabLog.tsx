@@ -1,5 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import { Lightbulb, GraduationCap, BookOpen, Rocket, CheckCircle2 } from "lucide-react";
 import { labLog, type LabLogType } from "@/data/labLog";
 
@@ -61,8 +63,7 @@ export function LabLog() {
                 <p className="mt-1 text-sm text-foreground/80">{entry.body}</p>
                 {entry.relatedSlug && (
                   <Link
-                    to="/experiments/$slug"
-                    params={{ slug: entry.relatedSlug }}
+                    href={`/experiments/${entry.relatedSlug}`}
                     className="mt-2 inline-block text-xs text-[var(--cyan-glow)] hover:underline"
                   >
                     View experiment →
