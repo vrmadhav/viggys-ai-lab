@@ -36,11 +36,11 @@ export function ExperimentsExplorer({ q, tag, status, from }: Props) {
 
   const setSearch = (next: Partial<{ q: string; tag: string; status: string }>) => {
     navigate({
-      search: (prev) => ({
+      search: (prev: Record<string, unknown>) => ({
         ...prev,
         ...next,
       }),
-    });
+    } as never);
   };
 
   const hasFilters = q || (tag && tag.length > 0) || (status && status !== "All");
