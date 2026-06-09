@@ -9,7 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useEffect } from "react";
-import { experiments, getExperimentBySlug } from "@/data/experiments";
+import { experiments, getExperimentBySlug, type Experiment } from "@/data/experiments";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 
 export const Route = createFileRoute("/experiments/$slug")({
@@ -42,7 +42,7 @@ const STATUS_STYLES = {
 } as const;
 
 function ExperimentDetail() {
-  const exp = Route.useLoaderData();
+  const exp = Route.useLoaderData() as Experiment;
 
   const idx = experiments.findIndex((e) => e.slug === exp.slug);
   const prev = idx > 0 ? experiments[idx - 1] : undefined;
