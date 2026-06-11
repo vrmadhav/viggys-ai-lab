@@ -4,7 +4,7 @@ import path from "path";
 const slug = process.argv[2];
 
 if (!slug) {
-  console.error("Usage: npm run new-experiment <slug>");
+  console.error("Usage: npm run new-episode <slug>");
   process.exit(1);
 }
 
@@ -13,58 +13,59 @@ const title = slug
   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
   .join(" ");
 
-const experimentDir = path.join(process.cwd(), "experiments", slug);
+const episodeDir = path.join(process.cwd(), "experiments", slug);
 
-if (fs.existsSync(experimentDir)) {
-  console.error(`Experiment already exists: ${slug}`);
+if (fs.existsSync(episodeDir)) {
+  console.error(`Episode already exists: ${slug}`);
   process.exit(1);
 }
 
-fs.mkdirSync(experimentDir, { recursive: true });
+fs.mkdirSync(episodeDir, { recursive: true });
 
 const metadata = {
   title,
   slug,
+  episode: null,
   status: "in-progress",
-  week: null,
   dateCreated: new Date().toISOString().split("T")[0],
   description: "",
+  idea: "",
+  promptUrl: "",
+  popular: false,
   tags: [],
+  tracks: {
+    promptOnly: { url: "", status: "planned" },
+    designThinking: { url: "", status: "planned" },
+  },
 };
 
 fs.writeFileSync(
-  path.join(experimentDir, "metadata.json"),
-  JSON.stringify(metadata, null, 2)
+  path.join(episodeDir, "metadata.json"),
+  JSON.stringify(metadata, null, 2),
 );
 
 fs.writeFileSync(
-  path.join(experimentDir, "page.tsx"),
-`import Link from "next/link";
+  path.join(episodeDir, "content.mdx"),
+  `## The idea
 
-export default function ${title.replaceAll(" ", "")}Experiment() {
-  return (
-    <main className="min-h-screen p-8">
-      <Link href="/" className="text-sm underline">
-        Back to Labs
-      </Link>
+Describe the spark for this episode.
 
-      <section className="mt-12 max-w-3xl">
-        <p className="text-sm uppercase tracking-wide opacity-60">
-          AI Experiment
-        </p>
+## The prompt
 
-        <h1 className="mt-3 text-5xl font-bold">
-          ${title}
-        </h1>
+How the idea became a researched prompt, and what that prompt asked for.
 
-        <p className="mt-6 text-lg opacity-80">
-          Experiment in progress.
-        </p>
-      </section>
-    </main>
-  );
-}
-`
+## Prompt-Only build
+
+What AI produced when handed the prompt alone.
+
+## Design-Thinking build
+
+What changed once real user research and design thinking were applied.
+
+## The verdict
+
+Did design make the difference? What did this episode teach us?
+`,
 );
 
-console.log(`Created experiment: ${slug}`);
+console.log(`Created episode: ${slug}`);

@@ -1,37 +1,21 @@
-import { experiments } from "./experiments";
-import { labLog } from "./labLog";
+import { getAllExperiments, type Episode } from "@/lib/experiments";
 import { site } from "./site";
 
-export function getStats() {
-  const shipped = experiments.filter((e) => e.status === "Live").length;
-  const all = experiments.length;
+export type SeriesStats = {
+  episodesPublished: number;
+  visitors: number;
+  mostPopular: Episode | null;
+};
 
-  // Streak = consecutive most-recent weeks with a shipped or in-progress experiment
-  const sorted = [...experiments].sort((a, b) => b.week - a.week);
-  let streak = 0;
-  let expectedWeek = sorted[0]?.week ?? 0;
-  for (const exp of sorted) {
-    if (exp.week === expectedWeek) {
-      streak += 1;
-      expectedWeek -= 1;
-    } else {
-      break;
-    }
-  }
+export function getStats(): SeriesStats {
+  const episodes = getAllExperiments();
 
-  const allDates = [
-    ...experiments.map((e) => e.publishedAt),
-    ...labLog.map((l) => l.date),
-  ].sort();
-  const lastUpdated = allDates[allDates.length - 1] ?? new Date().toISOString();
+  const mostPopular =
+    episodes.find((episode) => episode.popular) ?? episodes[0] ?? null;
 
   return {
-    shipped,
-    all,
-    streak,
-    lastUpdated,
+    episodesPublished: episodes.length,
     visitors: site.visitors,
-    missionTotal: site.missionTotal,
-    missionProgress: Math.min(1, all / site.missionTotal),
+    mostPopular,
   };
 }

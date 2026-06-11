@@ -1,24 +1,52 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export type Experiment = {
-  title: string;
-  slug: string;
-  status: string;
-  week: number | null;
-  dateCreated: string;
-  description: string;
-  tags: string[];
+export type TrackStatus = "live" | "in-progress" | "planned";
+
+export type Track = {
+  url?: string;
+  status: TrackStatus;
 };
 
-type ExperimentMetadata = Partial<Record<keyof Experiment, unknown>>;
+export type Episode = {
+  title: string;
+  slug: string;
+  episode: number | null;
+  status: string;
+  dateCreated: string;
+  description: string;
+  idea: string;
+  promptUrl: string;
+  tags: string[];
+  popular: boolean;
+  tracks: {
+    promptOnly: Track;
+    designThinking: Track;
+  };
+};
+
+/** @deprecated Use {@link Episode}. Kept as an alias during the migration. */
+export type Experiment = Episode;
+
+type EpisodeMetadata = Record<string, unknown>;
 
 const experimentsDirectory = path.join(process.cwd(), "experiments");
 
-function normalizeExperiment(
-  metadata: ExperimentMetadata,
+function normalizeTrack(value: unknown): Track {
+  const raw = (value ?? {}) as Record<string, unknown>;
+  const status =
+    raw.status === "live" || raw.status === "in-progress"
+      ? raw.status
+      : "planned";
+  const url = typeof raw.url === "string" && raw.url.length > 0 ? raw.url : undefined;
+
+  return { status, url };
+}
+
+function normalizeEpisode(
+  metadata: EpisodeMetadata,
   fallbackSlug: string,
-): Experiment | null {
+): Episode | null {
   if (typeof metadata.title !== "string") return null;
 
   const slug = typeof metadata.slug === "string" ? metadata.slug : fallbackSlug;
@@ -27,47 +55,66 @@ function normalizeExperiment(
     typeof metadata.dateCreated === "string" ? metadata.dateCreated : "";
   const description =
     typeof metadata.description === "string" ? metadata.description : "";
-  const week = typeof metadata.week === "number" ? metadata.week : null;
+  const idea = typeof metadata.idea === "string" ? metadata.idea : "";
+  const promptUrl =
+    typeof metadata.promptUrl === "string" ? metadata.promptUrl : "";
+  const episode =
+    typeof metadata.episode === "number" ? metadata.episode : null;
+  const popular = metadata.popular === true;
   const tags = Array.isArray(metadata.tags)
     ? metadata.tags.filter((tag): tag is string => typeof tag === "string")
     : [];
 
+  const tracksRaw = (metadata.tracks ?? {}) as Record<string, unknown>;
+
   return {
     title: metadata.title,
     slug,
+    episode,
     status,
-    week,
     dateCreated,
     description,
+    idea,
+    promptUrl,
     tags,
+    popular,
+    tracks: {
+      promptOnly: normalizeTrack(tracksRaw.promptOnly),
+      designThinking: normalizeTrack(tracksRaw.designThinking),
+    },
   };
 }
 
-function readExperimentMetadata(slug: string): Experiment | null {
+function readEpisodeMetadata(slug: string): Episode | null {
   const metadataPath = path.join(experimentsDirectory, slug, "metadata.json");
 
   if (!fs.existsSync(metadataPath)) return null;
 
   try {
     const rawMetadata = fs.readFileSync(metadataPath, "utf8");
-    const metadata = JSON.parse(rawMetadata) as ExperimentMetadata;
+    const metadata = JSON.parse(rawMetadata) as EpisodeMetadata;
 
-    return normalizeExperiment(metadata, slug);
+    return normalizeEpisode(metadata, slug);
   } catch {
     return null;
   }
 }
 
-export function getAllExperiments(): Experiment[] {
+export function getAllExperiments(): Episode[] {
   if (!fs.existsSync(experimentsDirectory)) return [];
 
-  const experiments = fs
+  const episodes = fs
     .readdirSync(experimentsDirectory, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .map((entry) => readExperimentMetadata(entry.name))
-    .filter((experiment): experiment is Experiment => experiment !== null);
+    .map((entry) => readEpisodeMetadata(entry.name))
+    .filter((episode): episode is Episode => episode !== null);
 
-  return experiments.sort((a, b) => {
+  return episodes.sort((a, b) => {
+    // Newest episode number first; fall back to creation date.
+    if (a.episode !== null && b.episode !== null) return b.episode - a.episode;
+    if (a.episode !== null) return -1;
+    if (b.episode !== null) return 1;
+
     const dateA = new Date(a.dateCreated).getTime();
     const dateB = new Date(b.dateCreated).getTime();
 
@@ -79,6 +126,19 @@ export function getAllExperiments(): Experiment[] {
   });
 }
 
-export function getExperimentBySlug(slug: string): Experiment | null {
-  return getAllExperiments().find((experiment) => experiment.slug === slug) ?? null;
+export function getExperimentBySlug(slug: string): Episode | null {
+  return getAllExperiments().find((episode) => episode.slug === slug) ?? null;
+}
+
+/** Reads the raw MDX write-up for an episode, or null if it has none yet. */
+export function getEpisodeContent(slug: string): string | null {
+  const contentPath = path.join(experimentsDirectory, slug, "content.mdx");
+
+  if (!fs.existsSync(contentPath)) return null;
+
+  try {
+    return fs.readFileSync(contentPath, "utf8");
+  } catch {
+    return null;
+  }
 }

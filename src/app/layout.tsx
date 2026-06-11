@@ -26,14 +26,14 @@ export const metadata: Metadata = {
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3000"),
   ),
-  title: "Viggy's AI Lab — 52 AI Experiments in 52 Weeks",
+  title: "Design vs. No Design — building apps with and without design",
   description:
-    "A living archive of weekly AI experiments, prototypes, and lessons learned by Viggy.",
+    "A series that builds the same app twice — once from a prompt, once with design thinking — to test whether design actually matters.",
   authors: [{ name: "Viggy" }],
   openGraph: {
-    title: "Viggy's AI Lab",
+    title: "Design vs. No Design",
     description:
-      "Weekly AI experiments, creative prototypes, and tiny bets on the future.",
+      "Same idea, two builds: AI from a prompt vs. real design thinking. Does design win?",
     type: "website",
   },
   twitter: {

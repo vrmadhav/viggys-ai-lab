@@ -1,10 +1,10 @@
 export const site = {
   name: "Viggy's Lab",
-  fullName: "Viggy's AI Lab",
-  tagline: "Weekly AI experiments, creative prototypes, and tiny bets on the future.",
+  fullName: "Design vs. No Design",
+  tagline:
+    "A series that builds the same app twice — once from a prompt, once with design thinking — to test whether design actually matters.",
   about:
-    "Designer, builder, and AI explorer. Every week I build a new experiment to learn, create, and push the boundaries of what's possible.",
-  missionTotal: 52,
+    "Each episode starts with an idea, turns it into a researched prompt, then forks: one build is handed to AI to figure out, the other gets real user research and design thinking. Same idea, two paths. You decide which wins.",
   email: "hello@viggylabs.com",
   links: {
     github: "https://github.com/viggylabs",
