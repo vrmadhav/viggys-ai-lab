@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 
-// Styling map for the MDX episode write-ups rendered inside the modal.
+// Styling map for the MDX project write-ups rendered inside the modal.
 export const mdxComponents = {
   h2: (props: ComponentProps<"h2">) => (
     <h2

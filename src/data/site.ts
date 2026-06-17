@@ -1,10 +1,10 @@
 export const site = {
-  name: "Viggy's Lab",
-  fullName: "Design vs. No Design",
+  name: "Viggy's AI Lab",
+  fullName: "Viggy's AI Lab",
   tagline:
-    "A series that builds the same app twice — once from a prompt, once with design thinking — to test whether design actually matters.",
+    "A living archive of small apps, prototypes, experiments, and build notes.",
   about:
-    "Each episode starts with an idea, turns it into a researched prompt, then forks: one build is handed to AI to figure out, the other gets real user research and design thinking. Same idea, two paths. You decide which wins.",
+    "This is where I collect the projects I'm building, testing, and thinking through. Some are polished, some are sketches, and some are just useful traces from the workbench.",
   email: "hello@viggylabs.com",
   links: {
     github: "https://github.com/viggylabs",
@@ -13,5 +13,4 @@ export const site = {
     rss: "/rss.xml",
     newsletter: "https://viggylabs.substack.com",
   },
-  visitors: 12480, // placeholder until analytics is wired
 };

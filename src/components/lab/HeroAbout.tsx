@@ -2,9 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, FlaskConical, Hammer, Sparkles } from "lucide-react";
 import { site } from "@/data/site";
-import { ProcessDiagram } from "./ProcessDiagram";
 
 const VISITED_KEY = "lab:visited";
 
@@ -57,10 +56,12 @@ export function HeroAbout() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-2.5 py-1 text-[11px] uppercase tracking-widest text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-[var(--cyan-glow)] shadow-[0_0_10px_var(--cyan-glow)]" />
-              A building series
+              Personal lab notes
             </div>
             <h1 className="mt-3 max-w-3xl font-display text-4xl font-semibold tracking-normal sm:text-5xl">
-              <span className="text-gradient">{site.fullName}</span>
+              <span className="inline-block bg-gradient-to-r from-foreground via-[var(--violet-glow)] to-[var(--cyan-glow)] bg-clip-text text-transparent">
+                {site.fullName}
+              </span>
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
               {site.tagline}
@@ -92,7 +93,38 @@ export function HeroAbout() {
             >
               <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
                 <p className="text-sm leading-7 text-foreground/85">{site.about}</p>
-                <ProcessDiagram />
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {[
+                    {
+                      label: "Apps",
+                      sublabel: "Small tools and prototypes",
+                      icon: Hammer,
+                    },
+                    {
+                      label: "Experiments",
+                      sublabel: "Ideas worth testing in public",
+                      icon: FlaskConical,
+                    },
+                    {
+                      label: "Notes",
+                      sublabel: "What changed while building",
+                      icon: Sparkles,
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-xl border border-border/60 bg-background/30 p-4"
+                    >
+                      <item.icon className="mb-3 h-4 w-4 text-[var(--cyan-glow)]" />
+                      <h2 className="font-display text-sm font-semibold tracking-normal">
+                        {item.label}
+                      </h2>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                        {item.sublabel}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}

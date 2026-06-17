@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "new-episode": "node scripts/new-experiment.mjs"
+    "new-project": "node scripts/new-project.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

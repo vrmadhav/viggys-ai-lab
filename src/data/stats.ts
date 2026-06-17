@@ -1,21 +1,20 @@
-import { getAllExperiments, type Episode } from "@/lib/experiments";
-import { site } from "./site";
+import { getAllProjects, type Project } from "@/lib/projects";
 
-export type SeriesStats = {
-  episodesPublished: number;
-  visitors: number;
-  mostPopular: Episode | null;
+export type LabStats = {
+  projectsPublished: number;
+  latestProject: Project | null;
+  featuredProject: Project | null;
 };
 
-export function getStats(): SeriesStats {
-  const episodes = getAllExperiments();
+export function getStats(): LabStats {
+  const projects = getAllProjects();
 
-  const mostPopular =
-    episodes.find((episode) => episode.popular) ?? episodes[0] ?? null;
+  const featuredProject =
+    projects.find((project) => project.featured) ?? projects[0] ?? null;
 
   return {
-    episodesPublished: episodes.length,
-    visitors: site.visitors,
-    mostPopular,
+    projectsPublished: projects.length,
+    latestProject: projects[0] ?? null,
+    featuredProject,
   };
 }

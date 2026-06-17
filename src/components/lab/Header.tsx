@@ -11,7 +11,7 @@ export function Header() {
           <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[var(--violet-glow)] to-[var(--cyan-glow)] shadow-[0_8px_30px_-10px_var(--violet-glow)]">
             <Sparkles className="h-3.5 w-3.5 text-background" />
           </span>
-          <span className="font-display text-base font-semibold tracking-tight">
+          <span className="font-display text-base font-semibold tracking-normal">
             {site.name}
           </span>
         </Link>

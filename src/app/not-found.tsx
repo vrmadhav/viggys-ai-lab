@@ -7,7 +7,7 @@ export default function NotFound() {
         <h1 className="font-display text-6xl font-semibold text-gradient">404</h1>
         <h2 className="mt-3 font-display text-xl font-medium">Lost in the lab</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          That experiment doesn&apos;t exist — or hasn&apos;t been shipped yet.
+          That project doesn&apos;t exist — or hasn&apos;t been shipped yet.
         </p>
         <div className="mt-6">
           <Link

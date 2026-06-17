@@ -19,7 +19,7 @@ export default function Error({
       <div className="glass max-w-md rounded-2xl border border-border/60 p-8 text-center">
         <h1 className="font-display text-xl font-semibold">This page didn&apos;t load</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something glitched mid-experiment. Try again or head home.
+          Something glitched in the lab. Try again or head home.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button

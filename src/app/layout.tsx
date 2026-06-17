@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { AmbientBg } from "@/components/lab/AmbientBg";
 import { Header } from "@/components/lab/Header";
@@ -12,10 +13,25 @@ const inter = Inter({
   display: "swap",
 });
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["500", "600", "700"],
+const satoshi = localFont({
+  variable: "--font-satoshi",
+  src: [
+    {
+      path: "../../public/fonts/satoshi/satoshi-400.woff2",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/satoshi/satoshi-500.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/satoshi/satoshi-700.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
   display: "swap",
 });
 
@@ -26,14 +42,14 @@ export const metadata: Metadata = {
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3000"),
   ),
-  title: "Design vs. No Design — building apps with and without design",
+  title: "Viggy's AI Lab — projects and experiments",
   description:
-    "A series that builds the same app twice — once from a prompt, once with design thinking — to test whether design actually matters.",
+    "A living archive of small apps, prototypes, experiments, and build notes.",
   authors: [{ name: "Viggy" }],
   openGraph: {
-    title: "Design vs. No Design",
+    title: "Viggy's AI Lab",
     description:
-      "Same idea, two builds: AI from a prompt vs. real design thinking. Does design win?",
+      "Small apps, prototypes, experiments, and build notes from Viggy.",
     type: "website",
   },
   twitter: {
@@ -47,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${spaceGrotesk.variable}`}>
+    <html lang="en" className={`dark ${inter.variable} ${satoshi.variable}`}>
       <body>
         <AmbientBg />
         <Header />

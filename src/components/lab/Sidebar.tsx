@@ -1,24 +1,20 @@
-import { Github, Linkedin, Twitter, Layers, Users, Star } from "lucide-react";
+import { Github, Linkedin, Twitter, Layers, Clock, Star } from "lucide-react";
 import { site } from "@/data/site";
 import { getStats } from "@/data/stats";
-
-function formatNumber(n: number) {
-  return new Intl.NumberFormat("en-US").format(n);
-}
 
 export function Sidebar() {
   const stats = getStats();
 
   const statItems = [
     {
-      label: "Episodes Published",
-      value: `${stats.episodesPublished}`,
+      label: "Projects",
+      value: `${stats.projectsPublished}`,
       icon: Layers,
     },
     {
-      label: "Total Visitors",
-      value: formatNumber(stats.visitors),
-      icon: Users,
+      label: "Latest",
+      value: stats.latestProject ? "Updated" : "Soon",
+      icon: Clock,
     },
   ];
 
@@ -28,7 +24,7 @@ export function Sidebar() {
       <section className="glass card-glow rounded-2xl p-5">
         <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-2.5 py-1 text-[11px] uppercase tracking-widest text-muted-foreground">
           <span className="h-1.5 w-1.5 rounded-full bg-[var(--cyan-glow)] shadow-[0_0_10px_var(--cyan-glow)]" />
-          The thesis
+          About the lab
         </div>
         <p className="text-sm leading-relaxed text-foreground/85">{site.about}</p>
       </section>
@@ -55,10 +51,9 @@ export function Sidebar() {
           ))}
         </div>
 
-        {/* Most popular */}
-        {stats.mostPopular && (
+        {stats.featuredProject && (
           <a
-            href={`#episode-${stats.mostPopular.slug}`}
+            href={`#project-${stats.featuredProject.slug}`}
             className="group mt-3 flex items-center gap-3 rounded-xl border border-border/60 bg-background/30 p-3 transition-colors hover:border-foreground/30"
           >
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-background/40 text-[var(--cyan-glow)]">
@@ -66,10 +61,10 @@ export function Sidebar() {
             </span>
             <span className="min-w-0">
               <span className="block text-[11px] uppercase tracking-widest text-muted-foreground">
-                Most Popular
+                Featured
               </span>
               <span className="block truncate text-sm font-medium text-foreground">
-                {stats.mostPopular.title}
+                {stats.featuredProject.title}
               </span>
             </span>
           </a>
