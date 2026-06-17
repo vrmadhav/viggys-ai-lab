@@ -3,12 +3,12 @@
   "slug": "artist-of-the-day",
   "status": "in-progress",
   "dateCreated": "2026-06-09",
-  "dateUpdated": "2026-06-09",
-  "description": "A daily ritual that introduces you to one artist and their work.",
-  "summary": "A quiet, once-a-day app that surfaces a single artist, a short essay on why they matter, and three representative works — art history as a habit, not a syllabus.",
+  "dateUpdated": "2026-06-16",
+  "description": "A daily ritual for training visual taste through one artist and a few guided looking prompts.",
+  "summary": "A quiet, once-a-day app for young designers: meet one artist, study three works, and learn how great creative choices build taste.",
   "image": "/experiments/daily-artist.jpg",
   "featured": true,
-  "tags": ["Art", "Education", "Daily"],
+  "tags": ["Art", "Design", "Taste", "Daily"],
   "links": {
     "demo": "/apps/artist-of-the-day"
   }

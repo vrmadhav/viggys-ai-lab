@@ -4,7 +4,7 @@ import { ArtistOfTheDayApp } from "@/features/artist-of-the-day/components/Artis
 export const metadata: Metadata = {
   title: "Artist Of The Day | Viggy's AI Lab",
   description:
-    "A mobile-first daily ritual for meeting one artist and a few representative works.",
+    "A mobile-first daily ritual for training visual taste through one artist and a few guided looking prompts.",
 };
 
 export default function ArtistOfTheDayPage() {

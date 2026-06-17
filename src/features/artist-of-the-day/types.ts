@@ -2,7 +2,10 @@ export type Artwork = {
   title: string;
   year: string;
   medium: string;
+  imageUrl: string;
   imageAlt: string;
+  lookingPrompt: string;
+  tasteLesson: string;
 };
 
 export type DailyArtist = {
@@ -14,6 +17,11 @@ export type DailyArtist = {
   date: string;
   summary: string;
   whyToday: string;
+  tastePrinciple: string;
+  weakTakeaway: string;
+  betterTakeaway: string;
+  visualVocabulary: string[];
+  trainingQuestions: string[];
   works: Artwork[];
   sources: {
     label: string;
