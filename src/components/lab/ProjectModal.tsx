@@ -31,25 +31,25 @@ function linkItems(project: Project) {
       label: "Open project",
       href: project.links.demo,
       icon: ExternalLink,
-      accent: "text-[var(--cyan-glow)]",
+      accent: "text-foreground",
     },
     {
       label: "Code",
       href: project.links.github,
       icon: Code2,
-      accent: "text-[var(--violet-glow)]",
+      accent: "text-foreground",
     },
     {
       label: "Notes",
       href: project.links.writeup,
       icon: BookOpenText,
-      accent: "text-[var(--cyan-glow)]",
+      accent: "text-foreground",
     },
     {
       label: "Video",
       href: project.links.video,
       icon: PlayCircle,
-      accent: "text-[var(--violet-glow)]",
+      accent: "text-foreground",
     },
   ].filter((item) => item.href);
 }
@@ -68,20 +68,20 @@ export function ProjectModal({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="glass max-h-[88vh] w-[calc(100vw-2rem)] max-w-2xl gap-0 overflow-y-auto rounded-2xl border-border/60 p-0 sm:rounded-2xl">
+      <DialogContent className="glass max-h-[88vh] w-[calc(100vw-2rem)] max-w-2xl gap-0 overflow-y-auto border-border p-0">
         <div className="border-b border-border/50 p-6">
           <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <span className="rounded-full border border-border/70 px-2 py-1">
+            <span className="border border-border px-2 py-1">
               {statusLabel(project.status)}
             </span>
             {project.dateUpdated || project.dateCreated ? (
-              <span className="rounded-full border border-border/70 px-2 py-1">
+              <span className="border border-border px-2 py-1">
                 {project.dateUpdated || project.dateCreated}
               </span>
             ) : null}
           </div>
 
-          <DialogTitle className="font-display text-2xl font-semibold tracking-normal">
+          <DialogTitle className="headline-sm">
             {project.title}
           </DialogTitle>
 
@@ -99,10 +99,10 @@ export function ProjectModal({
                   href={link.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-3 rounded-xl border border-border/60 bg-background/30 p-3 transition-colors hover:border-foreground/30"
+                  className="flex items-center gap-3 border border-border bg-background/50 p-3 transition-colors hover:border-foreground/30"
                 >
                   <span
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-background/50 ${link.accent}`}
+                    className={`flex h-9 w-9 items-center justify-center border border-border bg-background ${link.accent}`}
                   >
                     <link.icon className="h-4.5 w-4.5" />
                   </span>

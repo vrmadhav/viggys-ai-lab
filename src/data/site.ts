@@ -4,7 +4,7 @@ export const site = {
   tagline:
     "A living archive of small apps, prototypes, experiments, and build notes.",
   about:
-    "This is where I collect the projects I'm building, testing, and thinking through. Some are polished, some are sketches, and some are just useful traces from the workbench.",
+    "A running collection of things I'm making, testing, and occasionally overthinking.",
   email: "hello@viggylabs.com",
   links: {
     github: "https://github.com/viggylabs",

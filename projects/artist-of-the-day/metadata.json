@@ -9,5 +9,7 @@
   "image": "/experiments/daily-artist.jpg",
   "featured": true,
   "tags": ["Art", "Education", "Daily"],
-  "links": {}
+  "links": {
+    "demo": "/apps/artist-of-the-day"
+  }
 }

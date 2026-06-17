@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, Layers, Clock, Star } from "lucide-react";
+import { Github, Linkedin, Twitter, Layers, Clock } from "lucide-react";
 import { site } from "@/data/site";
 import { getStats } from "@/data/stats";
 
@@ -21,27 +21,27 @@ export function Sidebar() {
   return (
     <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto space-y-5 pr-1">
       {/* About */}
-      <section className="glass card-glow rounded-2xl p-5">
-        <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-2.5 py-1 text-[11px] uppercase tracking-widest text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-[var(--cyan-glow)] shadow-[0_0_10px_var(--cyan-glow)]" />
+      <section className="glass card-glow p-5">
+        <div className="label-sm mb-2 inline-flex items-center gap-2 border border-border bg-background px-2.5 py-1 text-muted-foreground">
+          <span className="h-1.5 w-1.5 bg-foreground" />
           About the lab
         </div>
-        <p className="text-sm leading-relaxed text-foreground/85">{site.about}</p>
+        <p className="body-sm text-foreground/85">{site.about}</p>
       </section>
 
       {/* Stats */}
-      <section className="glass rounded-2xl p-5">
-        <h3 className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+      <section className="glass p-5">
+        <h3 className="label-sm mb-3 text-muted-foreground">
           Stats
         </h3>
         <div className="grid grid-cols-2 gap-3">
           {statItems.map((s) => (
             <div
               key={s.label}
-              className="rounded-xl border border-border/60 bg-background/30 p-3"
+              className="border border-border bg-background/50 p-3"
             >
-              <s.icon className="mb-1.5 h-3.5 w-3.5 text-[var(--violet-glow)]" />
-              <div className="font-display text-lg font-semibold leading-tight">
+              <s.icon className="mb-1.5 h-3.5 w-3.5 text-foreground" />
+              <div className="font-display text-lg font-bold leading-tight">
                 {s.value}
               </div>
               <div className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
@@ -51,29 +51,11 @@ export function Sidebar() {
           ))}
         </div>
 
-        {stats.featuredProject && (
-          <a
-            href={`#project-${stats.featuredProject.slug}`}
-            className="group mt-3 flex items-center gap-3 rounded-xl border border-border/60 bg-background/30 p-3 transition-colors hover:border-foreground/30"
-          >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border/60 bg-background/40 text-[var(--cyan-glow)]">
-              <Star className="h-3.5 w-3.5" />
-            </span>
-            <span className="min-w-0">
-              <span className="block text-[11px] uppercase tracking-widest text-muted-foreground">
-                Featured
-              </span>
-              <span className="block truncate text-sm font-medium text-foreground">
-                {stats.featuredProject.title}
-              </span>
-            </span>
-          </a>
-        )}
       </section>
 
       {/* Quick links */}
-      <section className="glass rounded-2xl p-5">
-        <h3 className="mb-3 text-[11px] font-medium uppercase tracking-widest text-muted-foreground">
+      <section className="glass p-5">
+        <h3 className="label-sm mb-3 text-muted-foreground">
           Quick Links
         </h3>
         <ul className="space-y-2 text-sm">
@@ -87,7 +69,7 @@ export function Sidebar() {
                 href={l.href}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center justify-between rounded-lg border border-transparent px-2 py-1.5 transition-colors hover:border-border hover:bg-background/40"
+                className="group flex items-center justify-between border border-transparent px-2 py-1.5 transition-colors hover:border-border hover:bg-background/60"
               >
                 <span className="flex items-center gap-2">
                   <l.icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />

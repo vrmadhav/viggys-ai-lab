@@ -4,13 +4,13 @@ import type { ComponentProps } from "react";
 export const mdxComponents = {
   h2: (props: ComponentProps<"h2">) => (
     <h2
-      className="mt-7 mb-2 font-display text-lg font-semibold tracking-normal text-foreground first:mt-0"
+      className="mt-7 mb-2 font-display text-lg font-bold tracking-normal text-foreground first:mt-0"
       {...props}
     />
   ),
   h3: (props: ComponentProps<"h3">) => (
     <h3
-      className="mt-5 mb-2 font-display text-base font-semibold tracking-normal text-foreground"
+      className="mt-5 mb-2 font-display text-base font-bold tracking-normal text-foreground"
       {...props}
     />
   ),
@@ -31,7 +31,7 @@ export const mdxComponents = {
   ),
   a: (props: ComponentProps<"a">) => (
     <a
-      className="font-medium text-foreground underline underline-offset-4 hover:text-[var(--cyan-glow)]"
+      className="font-medium text-foreground underline underline-offset-4 hover:text-muted-foreground"
       target="_blank"
       rel="noreferrer"
       {...props}
