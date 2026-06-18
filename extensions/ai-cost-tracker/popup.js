@@ -5,15 +5,10 @@ const DEFAULT_PROJECT = {
   name: "General"
 };
 
-const SUPPORTED_HOSTS = [
-  "chatgpt.com",
-  "chat.openai.com",
-  "claude.ai",
-  "firefly.adobe.com",
-  "fal.ai"
-];
+const providerConfig = globalThis.AI_COST_TRACKER_PROVIDER_CONFIG;
 
 const DEFAULT_OPENAI_PRICE = { input: 0.75, output: 4.5 };
+const DEFAULT_PRICING_NOTE = "Estimate uses provider model pricing or API-equivalent text pricing where available. It is not your exact provider bill.";
 
 const MODEL_PRICES = [
   { match: /gpt-5\.5/i, input: 5, output: 30 },
@@ -28,7 +23,52 @@ const MODEL_PRICES = [
   { match: /claude\s+opus/i, input: 15, output: 75 },
   { match: /claude\s+sonnet/i, input: 3, output: 15 },
   { match: /claude\s+haiku\s+4\.5/i, input: 1, output: 5 },
-  { match: /claude\s+haiku/i, input: 0.8, output: 4 }
+  { match: /claude\s+haiku/i, input: 0.8, output: 4 },
+  { match: /gemini\s+3\.5\s+flash/i, input: 1.5, output: 9 },
+  { match: /gemini\s+3\.1\s+pro(?:\s+preview)?/i, input: 2, output: 12 },
+  { match: /gemini\s+3\.1\s+flash[- ]lite/i, input: 0.25, output: 1.5 },
+  { match: /gemini\s+3\.1\s+flash\s+live/i, input: 0.75, output: 4.5 },
+  { match: /gemini\s+3\.1\s+flash/i, input: 0.75, output: 4.5 }
+];
+
+const FAL_VIDEO_DIMENSIONS = {
+  "480p": { width: 854, height: 480 },
+  "720p": { width: 1280, height: 720 },
+  "1080p": { width: 1920, height: 1080 },
+  "4k": { width: 3840, height: 2160 }
+};
+
+const FAL_VIDEO_PRICES = [
+  {
+    match: /\bfal-ai\/veo3\.1\/image-to-video\b/i,
+    label: "Veo 3.1 image-to-video",
+    kind: "veo",
+    defaultDurationSeconds: 8,
+    defaultResolution: "720p"
+  },
+  {
+    match: /\bfal-ai\/veo3\/image-to-video\b/i,
+    label: "Veo 3 image-to-video",
+    kind: "veo",
+    defaultDurationSeconds: 8,
+    defaultResolution: "720p"
+  },
+  {
+    match: /\bbytedance\/seedance-2\.0\/fast\/image-to-video\b/i,
+    label: "Seedance 2.0 fast image-to-video",
+    kind: "seedance",
+    defaultDurationSeconds: 10,
+    defaultResolution: "720p",
+    tokenPricePerThousand: 0.0112
+  },
+  {
+    match: /\bbytedance\/seedance-2\.0\/image-to-video\b/i,
+    label: "Seedance 2.0 image-to-video",
+    kind: "seedance",
+    defaultDurationSeconds: 10,
+    defaultResolution: "720p",
+    tokenPricePerThousand: 0.014
+  }
 ];
 
 const els = {
@@ -39,6 +79,7 @@ const els = {
   detectedModel: document.getElementById("detectedModel"),
   detectedTurns: document.getElementById("detectedTurns"),
   detectedCost: document.getElementById("detectedCost"),
+  pricingNote: document.getElementById("pricingNote"),
   projectSelect: document.getElementById("projectSelect"),
   addProjectButton: document.getElementById("addProjectButton"),
   entryForm: document.getElementById("entryForm"),
@@ -69,18 +110,8 @@ function money(value) {
   }).format(value || 0);
 }
 
-function hostMatches(host, pattern) {
-  return host === pattern || host.endsWith(`.${pattern}`);
-}
-
 function isSupportedUrl(rawUrl) {
-  try {
-    const url = new URL(rawUrl || "");
-    return url.protocol === "https:" &&
-      SUPPORTED_HOSTS.some((host) => hostMatches(url.hostname.toLowerCase(), host));
-  } catch {
-    return false;
-  }
+  return Boolean(providerConfig.providerForUrl(rawUrl));
 }
 
 function shouldUseOpenAiFallback(tool, model) {
@@ -88,18 +119,130 @@ function shouldUseOpenAiFallback(tool, model) {
   return /\b(ChatGPT|OpenAI|GPT-|o\d)\b/i.test(text);
 }
 
-function getPrice(model, tool) {
+function getPrice(model, tool, pricingMode = "api-equivalent") {
+  if (pricingMode !== "api-equivalent") return null;
+
   const found = MODEL_PRICES.find((price) => price.match.test(model || ""));
   if (found) return found;
   return shouldUseOpenAiFallback(tool, model) ? DEFAULT_OPENAI_PRICE : null;
 }
 
-function estimateCost(inputTokens, outputTokens, model, tool) {
-  const price = getPrice(model, tool);
+function estimateCost(inputTokens, outputTokens, model, tool, pricingMode) {
+  const price = getPrice(model, tool, pricingMode);
   if (!price) return 0;
 
   return (Number(inputTokens || 0) / 1_000_000) * price.input +
     (Number(outputTokens || 0) / 1_000_000) * price.output;
+}
+
+function positiveNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function falSetting(value, fallback, validValues) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (validValues.includes(normalized)) {
+    return { value: normalized, isFallback: false };
+  }
+
+  return { value: fallback, isFallback: true };
+}
+
+function falDuration(details, fallback) {
+  const explicit = positiveNumber(details?.durationSeconds);
+  if (explicit) return { value: explicit, isFallback: false };
+  return { value: fallback, isFallback: true };
+}
+
+function falAudio(details) {
+  if (typeof details?.generateAudio === "boolean") {
+    return { value: details.generateAudio, isFallback: false };
+  }
+
+  return { value: true, isFallback: true };
+}
+
+function estimateFalVeo(rule, details) {
+  const duration = falDuration(details, rule.defaultDurationSeconds);
+  const resolution = falSetting(
+    details?.resolution,
+    rule.defaultResolution,
+    Object.keys(FAL_VIDEO_DIMENSIONS)
+  );
+  const audio = falAudio(details);
+  const rate = resolution.value === "4k"
+    ? audio.value ? 0.6 : 0.4
+    : audio.value ? 0.4 : 0.2;
+  const cost = duration.value * rate;
+  const fallbackParts = [
+    duration.isFallback ? `${duration.value}s default` : `${duration.value}s`,
+    resolution.isFallback ? `${resolution.value} default` : resolution.value,
+    audio.isFallback ? "audio on default" : audio.value ? "audio on" : "audio off"
+  ];
+
+  return {
+    cost,
+    source: "fal-model-pricing",
+    note: `${rule.label}: ${fallbackParts.join(", ")} at ${money(rate)}/sec.`
+  };
+}
+
+function estimateFalSeedance(rule, details) {
+  const duration = falDuration(details, rule.defaultDurationSeconds);
+  const resolution = falSetting(
+    details?.resolution,
+    rule.defaultResolution,
+    ["480p", "720p", "1080p"]
+  );
+  const dimensions = FAL_VIDEO_DIMENSIONS[resolution.value];
+  const billableTokens = (dimensions.width * dimensions.height * duration.value * 24) / 1024;
+  const cost = (billableTokens / 1000) * rule.tokenPricePerThousand;
+  const perSecond = cost / duration.value;
+  const fallbackParts = [
+    duration.isFallback ? `${duration.value}s default` : `${duration.value}s`,
+    resolution.isFallback ? `${resolution.value} default` : resolution.value
+  ];
+
+  return {
+    cost,
+    source: "fal-model-pricing",
+    note: `${rule.label}: ${fallbackParts.join(", ")} at about ${money(perSecond)}/sec.`
+  };
+}
+
+function estimateFalCost(item) {
+  if (!/fal\.ai/i.test(item?.tool || "")) return null;
+
+  const endpoint = `${item?.usageDetails?.endpoint || ""} ${item?.model || ""}`;
+  const rule = FAL_VIDEO_PRICES.find((price) => price.match.test(endpoint));
+  if (!rule) return null;
+
+  const details = item?.usageDetails || {};
+  return rule.kind === "seedance"
+    ? estimateFalSeedance(rule, details)
+    : estimateFalVeo(rule, details);
+}
+
+function estimateItemCost(item) {
+  const falEstimate = estimateFalCost(item);
+  if (falEstimate) return falEstimate;
+
+  if (!getPrice(item?.model, item?.tool, item?.pricingMode || "api-equivalent")) {
+    return null;
+  }
+
+  return {
+    cost: estimateCost(
+      item?.inputTokens,
+      item?.outputTokens,
+      item?.model,
+      item?.tool,
+      item?.pricingMode
+    ),
+    source: "api-equivalent",
+    note: item?.pricingNote || DEFAULT_PRICING_NOTE
+  };
 }
 
 function currentMonthEntries() {
@@ -174,6 +317,7 @@ function renderEntries() {
 
 function renderDetection() {
   const hasDetection = Boolean(detection?.detected);
+  const estimate = detection ? estimateItemCost(detection) : null;
   els.detectStatus.textContent = hasDetection ? "Detected" : "Manual";
   els.detectStatus.classList.toggle("ready", hasDetection);
   els.detectedTool.textContent = detection?.tool || "-";
@@ -181,14 +325,10 @@ function renderDetection() {
   els.detectedTurns.textContent = detection
     ? `${detection.userTurns || 0} in / ${detection.assistantTurns || 0} out`
     : "-";
-  els.detectedCost.textContent = detection
-    ? money(estimateCost(
-      detection.inputTokens,
-      detection.outputTokens,
-      detection.model,
-      detection.tool
-    ))
-    : "$0.00";
+  els.detectedCost.textContent = estimate
+    ? money(estimate.cost)
+    : detection?.pricingMode === "manual" ? "Manual" : "$0.00";
+  els.pricingNote.textContent = estimate?.note || detection?.pricingNote || DEFAULT_PRICING_NOTE;
 }
 
 function prefillForm() {
@@ -259,8 +399,18 @@ els.entryForm.addEventListener("submit", async (event) => {
   const outputTokens = Number(els.outputTokensInput.value || 0);
   const model = els.modelInput.value.trim() || detection?.model || "Unknown";
   const tool = els.toolInput.value.trim() || detection?.tool || "AI tool";
+  const pricingMode = detection?.pricingMode || "api-equivalent";
+  const pricingNote = detection?.pricingNote || "";
   const override = els.costInput.value === "" ? null : Number(els.costInput.value);
-  const estimatedCostUsd = override ?? estimateCost(inputTokens, outputTokens, model, tool);
+  const detectedEstimate = estimateItemCost({
+    ...detection,
+    inputTokens,
+    outputTokens,
+    model,
+    tool,
+    pricingMode
+  });
+  const estimatedCostUsd = override ?? detectedEstimate?.cost ?? 0;
 
   const entry = {
     id: crypto.randomUUID(),
@@ -272,6 +422,10 @@ els.entryForm.addEventListener("submit", async (event) => {
     inputTokens,
     outputTokens,
     estimatedCostUsd,
+    pricingMode,
+    pricingNote,
+    usageDetails: detection?.usageDetails || {},
+    costSource: override === null ? detectedEstimate?.source || "manual" : "override",
     rating: els.ratingInput.value,
     note: els.noteInput.value.trim(),
     url: detection?.url || "",

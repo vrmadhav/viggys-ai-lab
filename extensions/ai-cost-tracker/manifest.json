@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Cost Tracker",
   "description": "Estimate AI usage costs by project while you work.",
-  "version": "0.2.0",
+  "version": "0.3.2",
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "https://chatgpt.com/*",
@@ -11,7 +11,19 @@
     "https://*.claude.ai/*",
     "https://firefly.adobe.com/*",
     "https://fal.ai/*",
-    "https://*.fal.ai/*"
+    "https://*.fal.ai/*",
+    "https://gemini.google.com/*",
+    "https://flow.google/*",
+    "https://labs.google/fx/tools/flow*",
+    "https://canva.com/*",
+    "https://www.canva.com/*",
+    "https://midjourney.com/*",
+    "https://www.midjourney.com/*",
+    "https://runwayml.com/*",
+    "https://app.runwayml.com/*",
+    "https://meta.ai/*",
+    "https://www.meta.ai/*",
+    "https://ai.meta.com/*"
   ],
   "action": {
     "default_title": "AI Cost Tracker",
@@ -26,9 +38,21 @@
         "https://*.claude.ai/*",
         "https://firefly.adobe.com/*",
         "https://fal.ai/*",
-        "https://*.fal.ai/*"
+        "https://*.fal.ai/*",
+        "https://gemini.google.com/*",
+        "https://flow.google/*",
+        "https://labs.google/fx/tools/flow*",
+        "https://canva.com/*",
+        "https://www.canva.com/*",
+        "https://midjourney.com/*",
+        "https://www.midjourney.com/*",
+        "https://runwayml.com/*",
+        "https://app.runwayml.com/*",
+        "https://meta.ai/*",
+        "https://www.meta.ai/*",
+        "https://ai.meta.com/*"
       ],
-      "js": ["content.js"],
+      "js": ["provider-config.js", "content.js"],
       "run_at": "document_idle"
     }
   ]
