@@ -29,9 +29,11 @@ function formatDate(date: string) {
 export function ProjectCard({
   project,
   children,
+  priority = false,
 }: {
   project: Project;
   children: ReactNode;
+  priority?: boolean;
 }) {
   const trigger = (
     <button
@@ -45,6 +47,7 @@ export function ProjectCard({
             src={project.image}
             alt=""
             fill
+            loading={priority ? "eager" : "lazy"}
             sizes="(min-width: 1280px) 330px, (min-width: 768px) 50vw, 100vw"
             className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />

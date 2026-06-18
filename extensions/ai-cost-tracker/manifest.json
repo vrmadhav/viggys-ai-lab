@@ -2,16 +2,32 @@
   "manifest_version": 3,
   "name": "AI Cost Tracker",
   "description": "Estimate AI usage costs by project while you work.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "permissions": ["activeTab", "storage"],
-  "host_permissions": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://*.claude.ai/*",
+    "https://firefly.adobe.com/*",
+    "https://fal.ai/*",
+    "https://*.fal.ai/*"
+  ],
   "action": {
     "default_title": "AI Cost Tracker",
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"],
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://*.claude.ai/*",
+        "https://firefly.adobe.com/*",
+        "https://fal.ai/*",
+        "https://*.fal.ai/*"
+      ],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

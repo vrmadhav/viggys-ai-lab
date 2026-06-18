@@ -30,11 +30,15 @@ export default function Home() {
             </div>
           ) : (
             <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {projects.map((project) => {
+              {projects.map((project, index) => {
                 const content = getProjectContent(project.slug);
 
                 return (
-                  <ProjectCard key={project.slug} project={project}>
+                  <ProjectCard
+                    key={project.slug}
+                    project={project}
+                    priority={index === 0}
+                  >
                     {content ? (
                       <MDXRemote source={content} components={mdxComponents} />
                     ) : (

@@ -6,16 +6,17 @@ estimates usage, and lets users assign each session to a project.
 
 ## What works in the MVP
 
-- ChatGPT detection for visible conversation turns.
+- ChatGPT, Claude, Adobe Firefly, and fal.ai page detection.
+- Visible conversation or prompt text detection where the page exposes it.
 - Estimated input and output tokens based on page text length.
 - API-equivalent cost estimates with manual cost override.
 - Project tagging, usefulness rating, and short notes.
 - Local-only storage through Chrome extension storage.
 - JSON export for backup or later analysis.
 
-The estimate is deliberately framed as an estimate. ChatGPT subscriptions and API
-usage are billed differently, so this is a practical creative-production ledger,
-not an official billing dashboard.
+The estimate is deliberately framed as an estimate. Subscriptions, API usage,
+image credits, and per-model inference costs are billed differently, so this is a
+practical creative-production ledger, not an official billing dashboard.
 
 ## Install from the lab
 
@@ -29,11 +30,12 @@ not an official billing dashboard.
 
 ## Try it
 
-Open a ChatGPT conversation, then open the extension popup. It should detect the
-current conversation, estimate token usage, and prefill the log form. Select or
-create a project, add a rating or note, and log the entry.
+Open a supported AI page, then open the extension popup. It should detect the
+current tool, estimate token usage when visible text is available, and prefill
+the log form. Select or create a project, add a rating or note, and log the
+entry.
 
 ## Next
 
 The next useful steps are adding better project dashboards, editable model pricing,
-and a second AI surface for image or video credits.
+and deeper credit-aware estimates for image or video tools.

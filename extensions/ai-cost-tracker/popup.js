@@ -5,6 +5,16 @@ const DEFAULT_PROJECT = {
   name: "General"
 };
 
+const SUPPORTED_HOSTS = [
+  "chatgpt.com",
+  "chat.openai.com",
+  "claude.ai",
+  "firefly.adobe.com",
+  "fal.ai"
+];
+
+const DEFAULT_OPENAI_PRICE = { input: 0.75, output: 4.5 };
+
 const MODEL_PRICES = [
   { match: /gpt-5\.5/i, input: 5, output: 30 },
   { match: /gpt-5\.4 mini/i, input: 0.75, output: 4.5 },
@@ -12,7 +22,13 @@ const MODEL_PRICES = [
   { match: /gpt-4o-mini/i, input: 0.15, output: 0.6 },
   { match: /gpt-4o/i, input: 2.5, output: 10 },
   { match: /gpt-4\.1-mini/i, input: 0.4, output: 1.6 },
-  { match: /gpt-4\.1/i, input: 2, output: 8 }
+  { match: /gpt-4\.1/i, input: 2, output: 8 },
+  { match: /claude\s+(?:fable|mythos)/i, input: 10, output: 50 },
+  { match: /claude\s+opus\s+4\.[5-8]/i, input: 5, output: 25 },
+  { match: /claude\s+opus/i, input: 15, output: 75 },
+  { match: /claude\s+sonnet/i, input: 3, output: 15 },
+  { match: /claude\s+haiku\s+4\.5/i, input: 1, output: 5 },
+  { match: /claude\s+haiku/i, input: 0.8, output: 4 }
 ];
 
 const els = {
@@ -53,13 +69,35 @@ function money(value) {
   }).format(value || 0);
 }
 
-function getPrice(model) {
-  const found = MODEL_PRICES.find((price) => price.match.test(model || ""));
-  return found || MODEL_PRICES[1];
+function hostMatches(host, pattern) {
+  return host === pattern || host.endsWith(`.${pattern}`);
 }
 
-function estimateCost(inputTokens, outputTokens, model) {
-  const price = getPrice(model);
+function isSupportedUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl || "");
+    return url.protocol === "https:" &&
+      SUPPORTED_HOSTS.some((host) => hostMatches(url.hostname.toLowerCase(), host));
+  } catch {
+    return false;
+  }
+}
+
+function shouldUseOpenAiFallback(tool, model) {
+  const text = `${tool || ""} ${model || ""}`;
+  return /\b(ChatGPT|OpenAI|GPT-|o\d)\b/i.test(text);
+}
+
+function getPrice(model, tool) {
+  const found = MODEL_PRICES.find((price) => price.match.test(model || ""));
+  if (found) return found;
+  return shouldUseOpenAiFallback(tool, model) ? DEFAULT_OPENAI_PRICE : null;
+}
+
+function estimateCost(inputTokens, outputTokens, model, tool) {
+  const price = getPrice(model, tool);
+  if (!price) return 0;
+
   return (Number(inputTokens || 0) / 1_000_000) * price.input +
     (Number(outputTokens || 0) / 1_000_000) * price.output;
 }
@@ -144,7 +182,12 @@ function renderDetection() {
     ? `${detection.userTurns || 0} in / ${detection.assistantTurns || 0} out`
     : "-";
   els.detectedCost.textContent = detection
-    ? money(estimateCost(detection.inputTokens, detection.outputTokens, detection.model))
+    ? money(estimateCost(
+      detection.inputTokens,
+      detection.outputTokens,
+      detection.model,
+      detection.tool
+    ))
     : "$0.00";
 }
 
@@ -159,7 +202,7 @@ function prefillForm() {
 
 async function detectActiveTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (!tab?.id || !/^https:\/\/(chatgpt|chat\.openai)\.com\//.test(tab.url || "")) {
+  if (!tab?.id || !isSupportedUrl(tab.url)) {
     detection = null;
     renderDetection();
     return;
@@ -215,15 +258,16 @@ els.entryForm.addEventListener("submit", async (event) => {
   const inputTokens = Number(els.inputTokensInput.value || 0);
   const outputTokens = Number(els.outputTokensInput.value || 0);
   const model = els.modelInput.value.trim() || detection?.model || "Unknown";
+  const tool = els.toolInput.value.trim() || detection?.tool || "AI tool";
   const override = els.costInput.value === "" ? null : Number(els.costInput.value);
-  const estimatedCostUsd = override ?? estimateCost(inputTokens, outputTokens, model);
+  const estimatedCostUsd = override ?? estimateCost(inputTokens, outputTokens, model, tool);
 
   const entry = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     source: detection?.detected ? "detected" : "manual",
     projectId: project.id,
-    tool: els.toolInput.value.trim() || detection?.tool || "AI tool",
+    tool,
     model,
     inputTokens,
     outputTokens,
