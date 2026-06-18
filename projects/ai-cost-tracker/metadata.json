@@ -10,7 +10,7 @@
   "featured": true,
   "tags": ["Chrome extension", "AI costs", "Creative tools", "MVP"],
   "links": {
-    "demo": "/downloads/ai-cost-tracker-v0.3.2.zip",
+    "demo": "/downloads/ai-cost-tracker-v0.3.3.zip",
     "github": "https://github.com/viggylabs"
   }
 }

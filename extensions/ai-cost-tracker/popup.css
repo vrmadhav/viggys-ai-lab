@@ -107,9 +107,13 @@ h2 {
 
 .detected-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 12px 0 0;
+}
+
+.detected-grid > div {
+  min-width: 0;
 }
 
 dt {
@@ -122,6 +126,11 @@ dd {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 650;
+}
+
+#detectedModel {
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .note {

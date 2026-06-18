@@ -98,17 +98,17 @@ function detectModel(provider) {
   const urlModel = provider?.modelFromUrl?.();
   if (urlModel) return cleanModelText(urlModel);
 
-  for (const element of queryAll(provider?.modelSelectors)) {
-    const text = extractModelFromElementText(textFromNode(element), provider);
-    if (text) return text;
-  }
-
   const bodyText = document.body.innerText || "";
   const labeledModel = firstTextPatternMatch(
     bodyText.replace(/\s+/g, " ").trim(),
     provider?.modelLabelPatterns || []
   );
   if (labeledModel) return labeledModel;
+
+  for (const element of queryAll(provider?.modelSelectors)) {
+    const text = extractModelFromElementText(textFromNode(element), provider);
+    if (text) return text;
+  }
 
   const modelMatch = provider?.modelPattern ? bodyText.match(provider.modelPattern) : null;
   return cleanModelText(modelMatch?.[0]) || provider?.defaultModel || "Unknown";
