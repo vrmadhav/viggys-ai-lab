@@ -1,0 +1,39 @@
+## The idea
+
+AI Cost Tracker helps creatives understand what their AI work actually costs. The
+first version is a dev-loadable Chrome extension that watches supported AI tools,
+estimates usage, and lets users assign each session to a project.
+
+## What works in the MVP
+
+- ChatGPT detection for visible conversation turns.
+- Estimated input and output tokens based on page text length.
+- API-equivalent cost estimates with manual cost override.
+- Project tagging, usefulness rating, and short notes.
+- Local-only storage through Chrome extension storage.
+- JSON export for backup or later analysis.
+
+The estimate is deliberately framed as an estimate. ChatGPT subscriptions and API
+usage are billed differently, so this is a practical creative-production ledger,
+not an official billing dashboard.
+
+## Install from the lab
+
+1. Download the extension zip from **Open project**.
+2. Unzip it somewhere stable on your computer.
+3. Open Chrome and go to `chrome://extensions`.
+4. Turn on **Developer Mode**.
+5. Click **Load unpacked**.
+6. Select the unzipped `ai-cost-tracker` folder.
+7. Pin the extension from Chrome's extensions menu.
+
+## Try it
+
+Open a ChatGPT conversation, then open the extension popup. It should detect the
+current conversation, estimate token usage, and prefill the log form. Select or
+create a project, add a rating or note, and log the entry.
+
+## Next
+
+The next useful steps are adding better project dashboards, editable model pricing,
+and a second AI surface for image or video credits.

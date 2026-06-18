@@ -1,0 +1,16 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#F7F5EF"/>
+  <rect x="120" y="96" width="960" height="608" fill="#FFFDF8" stroke="#191713" stroke-width="3"/>
+  <rect x="168" y="152" width="264" height="112" fill="#136F63"/>
+  <rect x="472" y="152" width="264" height="112" fill="#E8DAB2" stroke="#191713" stroke-width="3"/>
+  <rect x="776" y="152" width="256" height="112" fill="#D6E8E3" stroke="#191713" stroke-width="3"/>
+  <rect x="168" y="328" width="384" height="48" fill="#191713"/>
+  <rect x="168" y="408" width="864" height="48" fill="#DED8CA"/>
+  <rect x="168" y="488" width="704" height="48" fill="#DED8CA"/>
+  <rect x="168" y="568" width="792" height="48" fill="#DED8CA"/>
+  <circle cx="940" cy="360" r="92" fill="#136F63"/>
+  <path d="M900 360L930 390L988 326" stroke="#FFFDF8" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="192" y="224" fill="#FFFDF8" font-family="Arial, sans-serif" font-size="52" font-weight="700">$12</text>
+  <text x="496" y="224" fill="#191713" font-family="Arial, sans-serif" font-size="44" font-weight="700">Tokens</text>
+  <text x="800" y="224" fill="#191713" font-family="Arial, sans-serif" font-size="44" font-weight="700">Projects</text>
+</svg>

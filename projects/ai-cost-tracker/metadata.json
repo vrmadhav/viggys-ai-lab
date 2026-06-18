@@ -1,0 +1,16 @@
+{
+  "title": "AI Cost Tracker",
+  "slug": "ai-cost-tracker",
+  "status": "in-progress",
+  "dateCreated": "2026-06-16",
+  "dateUpdated": "2026-06-16",
+  "description": "A dev-loadable Chrome extension that helps creatives estimate AI usage costs by project.",
+  "summary": "A Chrome extension MVP for tracking AI spend while working: detect ChatGPT activity, tag usage to projects, rate usefulness, and export a local ledger.",
+  "image": "/experiments/ai-cost-tracker.svg",
+  "featured": true,
+  "tags": ["Chrome extension", "AI costs", "Creative tools", "MVP"],
+  "links": {
+    "demo": "/downloads/ai-cost-tracker-v0.1.0.zip",
+    "github": "https://github.com/viggylabs"
+  }
+}

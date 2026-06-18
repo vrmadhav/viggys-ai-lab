@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Cost Tracker</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="header">
+        <div>
+          <p class="eyebrow">AI Cost Tracker</p>
+          <h1>Project spend</h1>
+        </div>
+        <button id="exportButton" class="icon-button" type="button" title="Export JSON">Export</button>
+      </header>
+
+      <section class="summary">
+        <div>
+          <span class="label">This month</span>
+          <strong id="monthSpend">$0.00</strong>
+        </div>
+        <div>
+          <span class="label">Logged</span>
+          <strong id="monthEntries">0</strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Current page</h2>
+          <span id="detectStatus" class="pill">Checking</span>
+        </div>
+        <dl class="detected-grid">
+          <div>
+            <dt>Tool</dt>
+            <dd id="detectedTool">-</dd>
+          </div>
+          <div>
+            <dt>Model</dt>
+            <dd id="detectedModel">-</dd>
+          </div>
+          <div>
+            <dt>Turns</dt>
+            <dd id="detectedTurns">-</dd>
+          </div>
+          <div>
+            <dt>Estimate</dt>
+            <dd id="detectedCost">$0.00</dd>
+          </div>
+        </dl>
+        <p class="note">Estimate uses page text length and API-equivalent model pricing. It is not your exact ChatGPT bill.</p>
+      </section>
+
+      <form id="entryForm" class="panel form">
+        <div class="field">
+          <label for="projectSelect">Project</label>
+          <div class="row">
+            <select id="projectSelect"></select>
+            <button id="addProjectButton" class="secondary" type="button">New</button>
+          </div>
+        </div>
+
+        <div class="split">
+          <label>
+            Tool
+            <input id="toolInput" name="tool" placeholder="ChatGPT">
+          </label>
+          <label>
+            Model
+            <input id="modelInput" name="model" placeholder="GPT-5.4">
+          </label>
+        </div>
+
+        <div class="split">
+          <label>
+            Input tokens
+            <input id="inputTokensInput" name="inputTokens" type="number" min="0" step="1">
+          </label>
+          <label>
+            Output tokens
+            <input id="outputTokensInput" name="outputTokens" type="number" min="0" step="1">
+          </label>
+        </div>
+
+        <div class="split">
+          <label>
+            Cost override
+            <input id="costInput" name="cost" type="number" min="0" step="0.01" placeholder="Auto">
+          </label>
+          <label>
+            Rating
+            <select id="ratingInput" name="rating">
+              <option value="useful">Useful</option>
+              <option value="reusable">Reusable</option>
+              <option value="client-ready">Client-ready</option>
+              <option value="wasted">Wasted</option>
+            </select>
+          </label>
+        </div>
+
+        <label>
+          Note
+          <textarea id="noteInput" name="note" rows="3" placeholder="What was this AI spend for?"></textarea>
+        </label>
+
+        <button class="primary" type="submit">Log usage</button>
+      </form>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Recent logs</h2>
+          <button id="clearButton" class="link-button" type="button">Clear all</button>
+        </div>
+        <div id="entriesList" class="entries"></div>
+      </section>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
