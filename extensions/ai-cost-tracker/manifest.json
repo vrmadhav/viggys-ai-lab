@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "AI Cost Tracker",
   "description": "Estimate AI usage costs by project while you work.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "https://chatgpt.com/*",

@@ -144,6 +144,62 @@ function parseBooleanValue(value) {
   return null;
 }
 
+function normalizePriceUnit(raw) {
+  const unit = String(raw || "").toLowerCase().replace(/s$/, "");
+  if (unit === "sec") return "second";
+  if (unit === "min") return "minute";
+  if (unit === "mp" || unit === "megapixel") return "megapixel";
+  return unit;
+}
+
+// fal publishes pricing as page text, e.g. "Billing is calculated per second
+// of video generated. For 720p, it will cost $0.045 per second without audio
+// and $0.060 per second with audio." Pull that region out of the DOM so we can
+// price any model from what it actually advertises instead of a static table.
+function falPricingText() {
+  const body = (document.body.innerText || "").replace(/\s+/g, " ");
+  const markers = [
+    /billing is calculated/i,
+    /\bfor\s+(?:360p|480p|540p|720p|1080p|2k|4k)\b/i,
+    /\$\s*[\d.]+\s*(?:per|\/)\s*(?:seconds?|secs?|minutes?|mins?|megapixels?|mp|images?|videos?|generations?|runs?)\b/i
+  ];
+
+  let start = -1;
+  for (const marker of markers) {
+    const idx = body.search(marker);
+    if (idx >= 0 && (start === -1 || idx < start)) start = idx;
+  }
+
+  return start === -1 ? "" : body.slice(start, start + 1600);
+}
+
+function parseFalPriceOptions(text) {
+  const tokenPattern =
+    /\bfor\s+(360p|480p|540p|720p|1080p|2k|4k)\b|\$\s*(\d+(?:\.\d+)?)\s*(?:per|\/)\s*(seconds?|secs?|minutes?|mins?|megapixels?|mp|images?|videos?|generations?|runs?)\b(?:\s+(with audio|without audio|no audio))?/gi;
+  const options = [];
+  let resolution = "";
+  let match;
+
+  while ((match = tokenPattern.exec(text))) {
+    if (match[1]) {
+      resolution = match[1].toLowerCase();
+      continue;
+    }
+
+    const price = Number(match[2]);
+    if (!Number.isFinite(price)) continue;
+
+    options.push({
+      price,
+      unit: normalizePriceUnit(match[3]),
+      resolution,
+      audio: match[4] ? !/without|no/i.test(match[4]) : null
+    });
+  }
+
+  return options;
+}
+
 function detectFalUsageDetails(model) {
   const resolution = (
     firstControlValue([
@@ -151,7 +207,7 @@ function detectFalUsageDetails(model) {
       '[aria-label*="resolution" i]',
       'button[aria-label*="resolution" i]'
     ]) ||
-    firstBodyMatch("Resolution", "480p|720p|1080p|4k")
+    firstBodyMatch("Resolution", "360p|480p|540p|720p|1080p|4k")
   ).toLowerCase();
   const durationRaw = firstControlValue([
     '[name="duration"]',
@@ -175,7 +231,8 @@ function detectFalUsageDetails(model) {
     durationRaw: durationRaw || "",
     durationSeconds: parseDurationSeconds(durationRaw),
     generateAudio: parseBooleanValue(audioRaw),
-    aspectRatio: aspectRatio || ""
+    aspectRatio: aspectRatio || "",
+    priceOptions: parseFalPriceOptions(falPricingText())
   };
 }
 

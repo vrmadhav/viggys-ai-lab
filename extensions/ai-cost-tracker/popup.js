@@ -9,6 +9,7 @@ const providerConfig = globalThis.AI_COST_TRACKER_PROVIDER_CONFIG;
 
 const DEFAULT_OPENAI_PRICE = { input: 0.75, output: 4.5 };
 const DEFAULT_PRICING_NOTE = "Estimate uses provider model pricing or API-equivalent text pricing where available. It is not your exact provider bill.";
+const NO_ESTIMATE_NOTE = "No built-in price for this model yet — enter a manual cost to log it.";
 
 const MODEL_PRICES = [
   { match: /gpt-5\.5/i, input: 5, output: 30 },
@@ -38,38 +39,8 @@ const FAL_VIDEO_DIMENSIONS = {
   "4k": { width: 3840, height: 2160 }
 };
 
-const FAL_VIDEO_PRICES = [
-  {
-    match: /\bfal-ai\/veo3\.1\/image-to-video\b/i,
-    label: "Veo 3.1 image-to-video",
-    kind: "veo",
-    defaultDurationSeconds: 8,
-    defaultResolution: "720p"
-  },
-  {
-    match: /\bfal-ai\/veo3\/image-to-video\b/i,
-    label: "Veo 3 image-to-video",
-    kind: "veo",
-    defaultDurationSeconds: 8,
-    defaultResolution: "720p"
-  },
-  {
-    match: /\bbytedance\/seedance-2\.0\/fast\/image-to-video\b/i,
-    label: "Seedance 2.0 fast image-to-video",
-    kind: "seedance",
-    defaultDurationSeconds: 10,
-    defaultResolution: "720p",
-    tokenPricePerThousand: 0.0112
-  },
-  {
-    match: /\bbytedance\/seedance-2\.0\/image-to-video\b/i,
-    label: "Seedance 2.0 image-to-video",
-    kind: "seedance",
-    defaultDurationSeconds: 10,
-    defaultResolution: "720p",
-    tokenPricePerThousand: 0.014
-  }
-];
+const FAL_DEFAULT_RESOLUTION = "720p";
+const FAL_DEFAULT_DURATION_SECONDS = 5;
 
 const els = {
   monthSpend: document.getElementById("monthSpend"),
@@ -110,6 +81,17 @@ function money(value) {
   }).format(value || 0);
 }
 
+// Unit rates can be sub-cent (e.g. $0.045/second), so keep more precision than
+// the 2-decimal dollar formatter used for totals.
+function rateMoney(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4
+  }).format(value || 0);
+}
+
 function isSupportedUrl(rawUrl) {
   return Boolean(providerConfig.providerForUrl(rawUrl));
 }
@@ -140,88 +122,98 @@ function positiveNumber(value) {
   return Number.isFinite(number) && number > 0 ? number : null;
 }
 
-function falSetting(value, fallback, validValues) {
-  const normalized = String(value || "").trim().toLowerCase();
-  if (validValues.includes(normalized)) {
-    return { value: normalized, isFallback: false };
-  }
-
-  return { value: fallback, isFallback: true };
-}
-
 function falDuration(details, fallback) {
   const explicit = positiveNumber(details?.durationSeconds);
   if (explicit) return { value: explicit, isFallback: false };
   return { value: fallback, isFallback: true };
 }
 
-function falAudio(details) {
-  if (typeof details?.generateAudio === "boolean") {
-    return { value: details.generateAudio, isFallback: false };
+// Pick the advertised price row that matches the detected job settings.
+// Options come straight from the model page, so resolution/audio tiers vary by
+// model; fall back to a sensible row (and flag the assumption) when a setting
+// is not detected on the page.
+function selectFalPriceOption(options, details) {
+  if (!Array.isArray(options) || !options.length) return null;
+
+  const detectedResolution = String(details?.resolution || "").toLowerCase();
+  const detectedAudio = typeof details?.generateAudio === "boolean"
+    ? details.generateAudio
+    : null;
+
+  let pool = options;
+  let resolutionAssumed = false;
+
+  if (options.some((option) => option.resolution)) {
+    const matched = detectedResolution
+      ? options.filter((option) => option.resolution === detectedResolution)
+      : [];
+
+    if (matched.length) {
+      pool = matched;
+    } else {
+      const fallbackResolution =
+        options.find((option) => option.resolution === FAL_DEFAULT_RESOLUTION)?.resolution ||
+        options.find((option) => option.resolution)?.resolution;
+      pool = options.filter((option) => option.resolution === fallbackResolution);
+      resolutionAssumed = true;
+    }
   }
 
-  return { value: true, isFallback: true };
-}
+  let option = pool[0];
+  let audioAssumed = false;
 
-function estimateFalVeo(rule, details) {
-  const duration = falDuration(details, rule.defaultDurationSeconds);
-  const resolution = falSetting(
-    details?.resolution,
-    rule.defaultResolution,
-    Object.keys(FAL_VIDEO_DIMENSIONS)
-  );
-  const audio = falAudio(details);
-  const rate = resolution.value === "4k"
-    ? audio.value ? 0.6 : 0.4
-    : audio.value ? 0.4 : 0.2;
-  const cost = duration.value * rate;
-  const fallbackParts = [
-    duration.isFallback ? `${duration.value}s default` : `${duration.value}s`,
-    resolution.isFallback ? `${resolution.value} default` : resolution.value,
-    audio.isFallback ? "audio on default" : audio.value ? "audio on" : "audio off"
-  ];
+  if (pool.some((entry) => entry.audio !== null)) {
+    if (detectedAudio !== null) {
+      option = pool.find((entry) => entry.audio === detectedAudio) || option;
+    } else {
+      // Default to the no-audio row when the page exposes both.
+      option = pool.find((entry) => entry.audio === false) || option;
+      audioAssumed = true;
+    }
+  }
 
-  return {
-    cost,
-    source: "fal-model-pricing",
-    note: `${rule.label}: ${fallbackParts.join(", ")} at ${money(rate)}/sec.`
-  };
-}
-
-function estimateFalSeedance(rule, details) {
-  const duration = falDuration(details, rule.defaultDurationSeconds);
-  const resolution = falSetting(
-    details?.resolution,
-    rule.defaultResolution,
-    ["480p", "720p", "1080p"]
-  );
-  const dimensions = FAL_VIDEO_DIMENSIONS[resolution.value];
-  const billableTokens = (dimensions.width * dimensions.height * duration.value * 24) / 1024;
-  const cost = (billableTokens / 1000) * rule.tokenPricePerThousand;
-  const perSecond = cost / duration.value;
-  const fallbackParts = [
-    duration.isFallback ? `${duration.value}s default` : `${duration.value}s`,
-    resolution.isFallback ? `${resolution.value} default` : resolution.value
-  ];
-
-  return {
-    cost,
-    source: "fal-model-pricing",
-    note: `${rule.label}: ${fallbackParts.join(", ")} at about ${money(perSecond)}/sec.`
-  };
+  return { option, resolutionAssumed, audioAssumed };
 }
 
 function estimateFalCost(item) {
   if (!/fal\.ai/i.test(item?.tool || "")) return null;
 
-  const endpoint = `${item?.usageDetails?.endpoint || ""} ${item?.model || ""}`;
-  const rule = FAL_VIDEO_PRICES.find((price) => price.match.test(endpoint));
-  if (!rule) return null;
-
   const details = item?.usageDetails || {};
-  return rule.kind === "seedance"
-    ? estimateFalSeedance(rule, details)
-    : estimateFalVeo(rule, details);
+  const selection = selectFalPriceOption(details.priceOptions, details);
+  if (!selection) return null;
+
+  const { option, resolutionAssumed, audioAssumed } = selection;
+  const parts = [];
+  let cost = option.price;
+
+  if (option.unit === "second" || option.unit === "minute") {
+    const duration = falDuration(details, FAL_DEFAULT_DURATION_SECONDS);
+    const seconds = option.unit === "minute" ? duration.value / 60 : duration.value;
+    cost = option.price * seconds;
+    parts.push(duration.isFallback ? `${duration.value}s default` : `${duration.value}s`);
+  } else if (option.unit === "megapixel") {
+    const dimensions = FAL_VIDEO_DIMENSIONS[option.resolution || details.resolution];
+    const megapixels = dimensions ? (dimensions.width * dimensions.height) / 1_000_000 : 1;
+    cost = option.price * megapixels;
+    parts.push(`${megapixels.toFixed(2)} MP`);
+  }
+
+  if (option.resolution) {
+    parts.push(resolutionAssumed ? `${option.resolution} default` : option.resolution);
+  }
+  if (option.audio !== null) {
+    const audioLabel = option.audio ? "audio on" : "audio off";
+    parts.push(audioAssumed ? `${audioLabel} default` : audioLabel);
+  }
+
+  const rate = `${rateMoney(option.price)}/${option.unit}`;
+  const detail = parts.length ? `${parts.join(", ")} at ${rate}` : rate;
+
+  return {
+    cost,
+    source: "fal-page-pricing",
+    note: `Estimated from this model's page pricing: ${detail}.`
+  };
 }
 
 function estimateItemCost(item) {
@@ -325,10 +317,12 @@ function renderDetection() {
   els.detectedTurns.textContent = detection
     ? `${detection.userTurns || 0} in / ${detection.assistantTurns || 0} out`
     : "-";
-  els.detectedCost.textContent = estimate
-    ? money(estimate.cost)
-    : detection?.pricingMode === "manual" ? "Manual" : "$0.00";
-  els.pricingNote.textContent = estimate?.note || detection?.pricingNote || DEFAULT_PRICING_NOTE;
+  const needsManualPrice = hasDetection && !estimate && detection?.pricingMode !== "manual";
+  els.detectedCost.textContent = estimate ? money(estimate.cost) : "Manual";
+  els.pricingNote.textContent =
+    estimate?.note ||
+    (needsManualPrice ? NO_ESTIMATE_NOTE : detection?.pricingNote) ||
+    DEFAULT_PRICING_NOTE;
 }
 
 function prefillForm() {
