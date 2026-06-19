@@ -1,0 +1,39 @@
+## The idea
+
+Figma to Claude Skill turns an existing Figma presentation into a reusable style
+package for AI-generated decks. Instead of asking Claude to invent presentation
+design from scratch, the plugin extracts the source deck's visual grammar and
+packages it as a Claude Skill scaffold.
+
+## What works in the MVP
+
+- Analyze selected Figma frames, components, or instances as presentation slides.
+- Export each slide as an SVG reference.
+- Extract solid color tokens and typography samples.
+- Infer simple slide archetypes such as section breaks, dense evidence slides,
+  editorial headline slides, and visual system slides.
+- Export reusable vector-like graphics as additional SVG files.
+- Generate `SKILL.md`, `references/style-guide.md`, and
+  `references/design-tokens.json`.
+
+## Graphics policy
+
+The first version is deliberately SVG-only. It does not package raster image
+fills into the generated skill. If a slide contains image fills, the plugin adds
+warnings and asks Claude to treat those images as descriptive art direction
+rather than embedded assets.
+
+## Install from the lab
+
+1. Download the plugin zip from **Open project**.
+2. Unzip it somewhere stable on your computer.
+3. Open Figma.
+4. Go to **Plugins > Development > Import plugin from manifest**.
+5. Select `manifest.json` from the unzipped folder.
+6. Select one or more deck frames and run **Figma to Claude Skill**.
+
+## Next
+
+The next useful step is a real zip exporter from inside the plugin, so the
+generated Claude Skill downloads as a ready-to-install folder instead of a bundle
+JSON plus individual files.

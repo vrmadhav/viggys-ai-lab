@@ -1,0 +1,16 @@
+{
+  "title": "Figma to Claude Skill",
+  "slug": "figma-to-claude-skill",
+  "status": "in-progress",
+  "dateCreated": "2026-06-19",
+  "dateUpdated": "2026-06-19",
+  "description": "A dev-loadable Figma plugin that extracts presentation frames into a Claude Skill scaffold.",
+  "summary": "A Figma plugin MVP that turns selected deck frames into AI-usable style instructions: typography, color tokens, slide archetypes, and SVG-only graphic references.",
+  "image": "/experiments/figma-to-claude-skill.svg",
+  "featured": true,
+  "tags": ["Figma plugin", "Claude Skill", "Presentations", "Design systems"],
+  "links": {
+    "demo": "/downloads/figma-to-claude-skill-v0.1.0.zip",
+    "github": "https://github.com/viggylabs"
+  }
+}

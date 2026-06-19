@@ -1,0 +1,345 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      main {
+        display: grid;
+        gap: 14px;
+        padding: 18px;
+      }
+
+      header,
+      .panel {
+        display: grid;
+        gap: 12px;
+      }
+
+      .eyebrow {
+        color: var(--figma-color-text-secondary);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0;
+        margin: 0;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 24px;
+        line-height: 1.15;
+      }
+
+      h2 {
+        font-size: 13px;
+        line-height: 1.3;
+      }
+
+      p {
+        color: var(--figma-color-text-secondary);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      .panel {
+        border: 1px solid var(--figma-color-border);
+        border-radius: 8px;
+        padding: 14px;
+        background: var(--figma-color-bg-secondary);
+      }
+
+      .muted {
+        background: var(--figma-color-bg-tertiary);
+      }
+
+      .row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .pill {
+        flex: 0 0 auto;
+        border: 1px solid var(--figma-color-border);
+        border-radius: 999px;
+        padding: 4px 8px;
+        color: var(--figma-color-text-secondary);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      button {
+        width: 100%;
+        min-height: 38px;
+        border: 1px solid var(--figma-color-bg-brand);
+        border-radius: 6px;
+        background: var(--figma-color-bg-brand);
+        color: var(--figma-color-text-onbrand);
+        cursor: pointer;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      button:disabled {
+        cursor: progress;
+        opacity: 0.65;
+      }
+
+      button.secondary {
+        border-color: var(--figma-color-border);
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .metrics div {
+        display: grid;
+        gap: 3px;
+        border: 1px solid var(--figma-color-border);
+        border-radius: 6px;
+        padding: 10px;
+        background: var(--figma-color-bg);
+      }
+
+      .metrics strong {
+        font-size: 18px;
+      }
+
+      .metrics span {
+        color: var(--figma-color-text-secondary);
+        font-size: 11px;
+      }
+
+      label {
+        color: var(--figma-color-text-secondary);
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 180px;
+        resize: vertical;
+        border: 1px solid var(--figma-color-border);
+        border-radius: 6px;
+        padding: 10px;
+        background: var(--figma-color-bg);
+        color: var(--figma-color-text);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        font-size: 11px;
+        line-height: 1.5;
+      }
+
+      .warnings {
+        display: grid;
+        gap: 6px;
+        border-left: 3px solid var(--figma-color-bg-warning);
+        padding-left: 10px;
+      }
+
+      .warnings p {
+        color: var(--figma-color-text-warning);
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">Figma to Claude</p>
+        <h1>Build a deck style skill</h1>
+        <p>
+          Select presentation frames, then generate a Claude Skill package with
+          extracted typography, colors, layout archetypes, and SVG references.
+        </p>
+      </header>
+
+      <section class="panel">
+        <div class="row">
+          <div>
+            <h2>Extraction scope</h2>
+            <p>
+              V1 exports graphics as SVG only. Image fills are flagged as
+              warnings and described as style direction instead of embedded
+              assets.
+            </p>
+          </div>
+          <span class="pill">SVG-only</span>
+        </div>
+
+        <button id="analyzeButton" type="button">Analyze selected frames</button>
+      </section>
+
+      <section class="panel muted" id="statusPanel">
+        <h2>Status</h2>
+        <p id="statusText">Select one or more frames and run the extractor.</p>
+      </section>
+
+      <section class="panel hidden" id="resultPanel">
+        <h2>Skill package</h2>
+        <div class="metrics">
+          <div>
+            <strong id="slideCount">0</strong>
+            <span>slides</span>
+          </div>
+          <div>
+            <strong id="svgCount">0</strong>
+            <span>SVG files</span>
+          </div>
+          <div>
+            <strong id="tokenCount">0</strong>
+            <span>tokens</span>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="downloadBundleButton" type="button">Download bundle JSON</button>
+          <button id="downloadFilesButton" type="button" class="secondary">Download files</button>
+        </div>
+
+        <label for="skillPreview">SKILL.md preview</label>
+        <textarea id="skillPreview" readonly></textarea>
+
+        <div id="warnings" class="warnings hidden"></div>
+      </section>
+    </main>
+
+    <script>
+      const els = {
+        analyzeButton: document.getElementById("analyzeButton"),
+        statusText: document.getElementById("statusText"),
+        resultPanel: document.getElementById("resultPanel"),
+        slideCount: document.getElementById("slideCount"),
+        svgCount: document.getElementById("svgCount"),
+        tokenCount: document.getElementById("tokenCount"),
+        skillPreview: document.getElementById("skillPreview"),
+        warnings: document.getElementById("warnings"),
+        downloadBundleButton: document.getElementById("downloadBundleButton"),
+        downloadFilesButton: document.getElementById("downloadFilesButton")
+      };
+
+      let currentBundle = null;
+
+      function setWorking(isWorking) {
+        els.analyzeButton.disabled = isWorking;
+        els.analyzeButton.textContent = isWorking ? "Analyzing..." : "Analyze selected frames";
+      }
+
+      function downloadFile(path, content, mime) {
+        const blob = new Blob([content], { type: mime || "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+
+        anchor.href = url;
+        anchor.download = path.replace(/\//g, "__");
+        document.body.append(anchor);
+        anchor.click();
+        anchor.remove();
+
+        window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      function renderBundle(bundle) {
+        currentBundle = bundle;
+        els.resultPanel.classList.remove("hidden");
+        els.statusText.textContent = `Generated ${bundle.files.length} files for ${bundle.summary.projectName}.`;
+        els.slideCount.textContent = String(bundle.summary.slideCount);
+        els.svgCount.textContent = String(bundle.summary.svgCount);
+        els.tokenCount.textContent = String(bundle.summary.colors + bundle.summary.typographyStyles);
+
+        const skillFile = bundle.files.find((file) => file.path === "SKILL.md");
+        els.skillPreview.value = skillFile?.content || "";
+
+        els.warnings.innerHTML = "";
+        if (bundle.summary.warnings.length) {
+          els.warnings.classList.remove("hidden");
+          for (const warning of bundle.summary.warnings) {
+            const item = document.createElement("p");
+            item.textContent = warning;
+            els.warnings.append(item);
+          }
+        } else {
+          els.warnings.classList.add("hidden");
+        }
+      }
+
+      els.analyzeButton.addEventListener("click", () => {
+        setWorking(true);
+        els.statusText.textContent = "Reading selected frames and exporting SVG references...";
+        parent.postMessage({ pluginMessage: { type: "analyze-selection" } }, "*");
+      });
+
+      els.downloadBundleButton.addEventListener("click", () => {
+        if (!currentBundle) return;
+
+        downloadFile(
+          `${currentBundle.name}.json`,
+          JSON.stringify(currentBundle, null, 2),
+          "application/json"
+        );
+      });
+
+      els.downloadFilesButton.addEventListener("click", () => {
+        if (!currentBundle) return;
+
+        currentBundle.files.forEach((file, index) => {
+          window.setTimeout(() => {
+            downloadFile(file.path, file.content, file.mime);
+          }, index * 120);
+        });
+      });
+
+      window.onmessage = (event) => {
+        const message = event.data.pluginMessage;
+        if (!message) return;
+
+        setWorking(false);
+
+        if (message.type === "analysis-complete") {
+          renderBundle(message.bundle);
+        }
+
+        if (message.type === "analysis-error") {
+          els.statusText.textContent = message.message;
+        }
+      };
+    </script>
+  </body>
+</html>
