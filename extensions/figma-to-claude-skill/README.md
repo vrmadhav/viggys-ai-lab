@@ -31,14 +31,15 @@ instead of depending on embedded bitmaps.
 3. Select `extensions/figma-to-claude-skill/manifest.json`.
 4. Select one or more presentation frames.
 5. Run **Figma to Claude Skill**.
-6. Download the generated bundle JSON or individual skill files.
+6. Click **Download skill .zip** for a ready-to-install folder (or **Download
+   bundle JSON** for the raw structured archive).
 
 ## Using the generated skill
 
-Create a skill folder with the generated files:
+The `.zip` already contains a single ready-to-install skill folder:
 
 ```text
-my-deck-style/
+my-deck-deck-style/
   SKILL.md
   references/
     style-guide.md
@@ -48,13 +49,21 @@ my-deck-style/
     graphics/
 ```
 
-Install or import that folder wherever Claude Skills are supported. The skill
-uses the source deck as visual direction: typography, color, layout rhythm,
-archetypes, and SVG graphic references.
+`SKILL.md` opens with YAML frontmatter (`name` + `description`) so claude.ai,
+Desktop, and the CLI can register it. The `name` matches the folder name.
+
+1. Unzip it.
+2. Move the folder into `~/.claude/skills/` (all projects) or a project's
+   `.claude/skills/`. On claude.ai or Desktop, upload the `.zip` directly via the
+   Skills / Capabilities panel.
+3. Tell Claude: `Use the my-deck-deck-style skill to design new slides for
+   <topic>.`
+
+The skill uses the source deck as visual direction: typography, color, layout
+rhythm, archetypes, and SVG graphic references.
 
 ## Next
 
-- Add a real zip writer so the plugin can export a ready-to-install folder.
 - Add better archetype classification for agenda, quote, chart, and comparison
   slides.
 - Add optional redaction for proprietary text before skill export.

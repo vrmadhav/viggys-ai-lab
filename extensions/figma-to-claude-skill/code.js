@@ -19,6 +19,12 @@ function round(value) {
   return Math.round(Number(value || 0) * 100) / 100;
 }
 
+// Default skill name suggested in the UI, derived from the Figma file name.
+// The user can shorten or replace it before extracting.
+function defaultSkillName() {
+  return `${slugify(figma.root.name || "presentation")}-deck-style`;
+}
+
 function paintToHex(paint) {
   if (!paint || paint.type !== "SOLID" || !paint.color) return null;
 
@@ -36,7 +42,7 @@ function getSolidPaints(paints) {
     .filter((paint) => paint.visible !== false && paint.type === "SOLID")
     .map((paint) => ({
       hex: paintToHex(paint),
-      opacity: paint.opacity ?? 1
+      opacity: paint.opacity == null ? 1 : paint.opacity
     }))
     .filter((paint) => paint.hex);
 }
@@ -174,6 +180,58 @@ function collectSlide(slide, index) {
   };
 }
 
+function decodeUtf8(bytes) {
+  let result = "";
+  let i = 0;
+
+  while (i < bytes.length) {
+    const byte1 = bytes[i++];
+
+    if (byte1 < 0x80) {
+      result += String.fromCharCode(byte1);
+    } else if (byte1 >= 0xc0 && byte1 < 0xe0) {
+      const byte2 = bytes[i++] & 0x3f;
+      result += String.fromCharCode(((byte1 & 0x1f) << 6) | byte2);
+    } else if (byte1 >= 0xe0 && byte1 < 0xf0) {
+      const byte2 = bytes[i++] & 0x3f;
+      const byte3 = bytes[i++] & 0x3f;
+      result += String.fromCharCode(((byte1 & 0x0f) << 12) | (byte2 << 6) | byte3);
+    } else {
+      const byte2 = bytes[i++] & 0x3f;
+      const byte3 = bytes[i++] & 0x3f;
+      const byte4 = bytes[i++] & 0x3f;
+      let codePoint = ((byte1 & 0x07) << 18) | (byte2 << 12) | (byte3 << 6) | byte4;
+      codePoint -= 0x10000;
+      result += String.fromCharCode(0xd800 + (codePoint >> 10), 0xdc00 + (codePoint & 0x3ff));
+    }
+  }
+
+  return result;
+}
+
+// A 1x1 light-gray PNG used to replace embedded raster images so the exported
+// SVGs (and the resulting skill .zip) stay well under Claude's 30MB limit.
+const GRAY_PIXEL_DATA_URI =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGM4c+YMAATMAmU5mmUsAAAAAElFTkSuQmCC";
+
+// Matches any embedded raster data URI (the base64 payload Figma inlines for
+// image fills). Base64 never contains quotes, so we stop at the next quote.
+const EMBEDDED_IMAGE_RE = /data:image\/[a-zA-Z0-9.+-]+;base64,[^"')]+/g;
+
+// Replaces embedded raster image data with a tiny gray placeholder pixel.
+// Figma renders image fills via <pattern>/<image> referencing inline base64;
+// swapping the payload for a 1x1 gray pixel makes those shapes render as gray
+// boxes while collapsing potentially multi-MB SVGs down to a few KB.
+function stripEmbeddedImages(svg) {
+  let count = 0;
+  const cleaned = svg.replace(EMBEDDED_IMAGE_RE, () => {
+    count += 1;
+    return GRAY_PIXEL_DATA_URI;
+  });
+
+  return { svg: cleaned, strippedImages: count };
+}
+
 async function exportSvg(node) {
   const bytes = await node.exportAsync({
     format: "SVG",
@@ -182,7 +240,7 @@ async function exportSvg(node) {
     svgSimplifyStroke: true
   });
 
-  return new TextDecoder().decode(bytes);
+  return stripEmbeddedImages(decodeUtf8(bytes));
 }
 
 function summarizeColors(slides) {
@@ -236,7 +294,7 @@ function inferArchetype(slide) {
   return "Mixed layout slide";
 }
 
-function buildStyleGuide(projectName, slides, assets) {
+function buildStyleGuide(projectName, slides, assets, skillSlug) {
   const colors = summarizeColors(slides);
   const typography = summarizeTypography(slides);
   const archetypes = slides.map((slide) => ({
@@ -293,7 +351,16 @@ function buildStyleGuide(projectName, slides, assets) {
     allWarnings.length ? "\n## Extraction Warnings\n\n" + allWarnings.map((warning) => `- ${warning}`).join("\n") : ""
   ].join("\n");
 
+  const skillDescription =
+    `Apply the visual language (typography, color, layout archetypes, and SVG graphics) extracted from the ${projectName} Figma deck. ` +
+    "Use when creating or revising presentation slides that should match this source deck's style.";
+
   const skill = [
+    "---",
+    `name: ${skillSlug}`,
+    `description: "${skillDescription.replace(/\n/g, " ").slice(0, 1024).replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`,
+    "---",
+    "",
     `# ${projectName} Deck Style`,
     "",
     "Use this skill when creating or revising presentation slides that should follow the visual language extracted from the source Figma deck.",
@@ -333,7 +400,7 @@ function buildStyleGuide(projectName, slides, assets) {
   };
 }
 
-async function analyzeSelection() {
+async function analyzeSelection(message) {
   const selected = getSelectedSlides();
 
   if (!selected.length) {
@@ -345,14 +412,44 @@ async function analyzeSelection() {
   }
 
   const projectName = figma.root.name || "Figma Presentation";
+  const requestedName =
+    message && typeof message.skillName === "string" ? slugify(message.skillName) : "";
+  const skillSlug = requestedName || defaultSkillName();
+
+  figma.ui.postMessage({
+    type: "analysis-progress",
+    current: 0,
+    total: selected.length,
+    label: "Reading selected frames..."
+  });
+
   const slideData = selected.map(collectSlide);
   const assets = [];
   const files = [];
+  let placeholderCount = 0;
+
+  const plannedGraphics = slideData.reduce(
+    (sum, slide) => sum + slide.vectorCandidates.length,
+    0
+  );
+  const totalSteps = slideData.length + Math.min(plannedGraphics, MAX_ASSET_EXPORTS);
+  let completedSteps = 0;
+
+  const reportProgress = (label) => {
+    figma.ui.postMessage({
+      type: "analysis-progress",
+      current: completedSteps,
+      total: totalSteps,
+      label
+    });
+  };
 
   for (const slide of slideData) {
     const node = selected[slide.index - 1];
     const slidePath = `assets/slides/${String(slide.index).padStart(2, "0")}-${slide.safeName}.svg`;
-    const svg = await exportSvg(node);
+    reportProgress(`Exporting slide ${slide.index} of ${slideData.length}: ${slide.name}`);
+    const { svg, strippedImages } = await exportSvg(node);
+    placeholderCount += strippedImages;
 
     assets.push({
       path: slidePath,
@@ -363,6 +460,9 @@ async function analyzeSelection() {
       content: svg,
       mime: "image/svg+xml"
     });
+
+    completedSteps += 1;
+    reportProgress(`Exported slide ${slide.index} of ${slideData.length}`);
   }
 
   let exportedAssetCount = 0;
@@ -371,8 +471,10 @@ async function analyzeSelection() {
       if (exportedAssetCount >= MAX_ASSET_EXPORTS) break;
 
       try {
+        reportProgress(`Exporting graphic ${exportedAssetCount + 1}: ${candidate.name}`);
         const path = `assets/graphics/${String(exportedAssetCount + 1).padStart(2, "0")}-${slugify(candidate.name)}.svg`;
-        const svg = await exportSvg(candidate);
+        const { svg, strippedImages } = await exportSvg(candidate);
+        placeholderCount += strippedImages;
         exportedAssetCount += 1;
         assets.push({
           path,
@@ -383,15 +485,26 @@ async function analyzeSelection() {
           content: svg,
           mime: "image/svg+xml"
         });
-      } catch {
+        completedSteps += 1;
+        reportProgress(`Exported graphic ${exportedAssetCount} of ${Math.min(plannedGraphics, MAX_ASSET_EXPORTS)}`);
+      } catch (exportError) {
         // Some nodes cannot be exported independently; the slide SVG still remains useful.
+        completedSteps += 1;
       }
     }
   }
 
-  const generated = buildStyleGuide(projectName, slideData, assets);
+  completedSteps = totalSteps;
+  reportProgress("Building style guide and tokens...");
+  const generated = buildStyleGuide(projectName, slideData, assets, skillSlug);
+
+  const extraWarnings = placeholderCount > 0
+    ? [
+        `Replaced ${placeholderCount} embedded raster image${placeholderCount === 1 ? "" : "s"} with gray placeholders to keep the skill .zip under Claude's 30MB limit. Treat these as image-placement guidance, not source imagery.`
+      ]
+    : [];
   const bundle = {
-    name: `${slugify(projectName)}-claude-skill`,
+    name: skillSlug,
     files: [
       {
         path: "SKILL.md",
@@ -414,9 +527,10 @@ async function analyzeSelection() {
       projectName,
       slideCount: slideData.length,
       svgCount: files.length,
+      placeholderCount,
       colors: generated.tokens.colors.length,
       typographyStyles: generated.tokens.typography.length,
-      warnings: slideData.flatMap((slide) => slide.warnings)
+      warnings: slideData.flatMap((slide) => slide.warnings).concat(extraWarnings)
     }
   };
 
@@ -427,9 +541,13 @@ async function analyzeSelection() {
 }
 
 figma.ui.onmessage = async (message) => {
+  if (message.type === "request-default-name") {
+    figma.ui.postMessage({ type: "default-name", name: defaultSkillName() });
+  }
+
   if (message.type === "analyze-selection") {
     try {
-      await analyzeSelection();
+      await analyzeSelection(message);
     } catch (error) {
       figma.ui.postMessage({
         type: "analysis-error",
