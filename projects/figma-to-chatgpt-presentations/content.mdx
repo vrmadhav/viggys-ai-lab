@@ -1,0 +1,52 @@
+## The idea
+
+Figma to ChatGPT Presentations turns an existing Figma deck into a reusable
+ChatGPT presentation style kit. Instead of asking ChatGPT to invent a deck
+style from scratch, the plugin extracts the source deck's visual grammar and
+packages it as GPT instructions, knowledge files, design tokens, slide
+archetypes, and SVG references.
+
+## What works in the MVP
+
+- Analyze selected Figma frames, components, or instances as presentation
+  slides.
+- Extract typography, solid color tokens, spacing rhythm, shape treatment, and
+  slide density.
+- Infer common slide archetypes such as section breaks, image-led slides,
+  comparison slides, dense evidence slides, and visual system slides.
+- Export representative full-slide SVG references and reusable vector graphics.
+- Generate a ready-to-upload ChatGPT kit with:
+  - `gpt-instructions.md`
+  - `knowledge/presentation-style-guide.md`
+  - `knowledge/design-tokens.json`
+  - `knowledge/slide-archetypes.json`
+  - `knowledge/asset-index.md`
+  - `prompts/starter-prompts.md`
+
+## ChatGPT setup
+
+The exported kit is designed for Custom GPTs. Copy the generated instructions
+into the GPT Builder, upload the knowledge files, and add selected SVG
+references when there is room. Enable Code Interpreter / Data Analysis when the
+GPT should create editable PPTX files.
+
+## Graphics policy
+
+The first version is intentionally text-first and SVG-guided. It does not
+package original raster images from the Figma file. If a source slide contains
+image fills, the plugin records warnings and asks ChatGPT to treat those images
+as descriptive art direction rather than embedded source assets.
+
+## Install from the lab
+
+1. Download the plugin zip from **Open project**.
+2. Unzip it somewhere stable on your computer.
+3. Open Figma.
+4. Go to **Plugins > Development > Import plugin from manifest**.
+5. Select `manifest.json` from the unzipped folder.
+6. Select one or more deck frames and run **Figma to ChatGPT Presentations**.
+
+## Next
+
+The next useful step is a review screen where the user can prune, rename, and
+prioritize exported SVG references before downloading the ChatGPT kit.
