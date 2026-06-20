@@ -1,0 +1,28 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#EEF2ED"/>
+  <rect x="84" y="82" width="450" height="636" rx="8" fill="#FFFFFF" stroke="#20241E" stroke-width="3"/>
+  <rect x="666" y="82" width="450" height="636" rx="8" fill="#0F1720" stroke="#20241E" stroke-width="3"/>
+  <rect x="128" y="126" width="362" height="206" fill="#3D6F63"/>
+  <rect x="158" y="362" width="246" height="30" fill="#20241E"/>
+  <rect x="158" y="414" width="302" height="20" fill="#A9B5A2"/>
+  <rect x="158" y="454" width="248" height="20" fill="#A9B5A2"/>
+  <rect x="158" y="494" width="324" height="20" fill="#A9B5A2"/>
+  <rect x="158" y="574" width="90" height="90" fill="#E7B84B"/>
+  <circle cx="420" cy="618" r="52" fill="#D95D39"/>
+  <path d="M548 396H646" stroke="#20241E" stroke-width="18" stroke-linecap="round"/>
+  <path d="M620 346L670 396L620 446" stroke="#20241E" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="716" y="132" width="188" height="28" fill="#EEF2ED"/>
+  <rect x="716" y="184" width="318" height="18" fill="#70D6B2"/>
+  <rect x="716" y="222" width="244" height="18" fill="#70D6B2"/>
+  <rect x="716" y="288" width="348" height="88" fill="#EEF2ED"/>
+  <rect x="744" y="316" width="184" height="18" fill="#0F1720"/>
+  <rect x="744" y="348" width="260" height="12" fill="#7E8A96"/>
+  <rect x="716" y="424" width="160" height="94" fill="#EEF2ED"/>
+  <rect x="904" y="424" width="160" height="94" fill="#EEF2ED"/>
+  <rect x="744" y="456" width="92" height="18" fill="#0F1720"/>
+  <rect x="932" y="456" width="96" height="18" fill="#0F1720"/>
+  <rect x="716" y="566" width="348" height="82" fill="#EEF2ED"/>
+  <rect x="744" y="594" width="210" height="18" fill="#0F1720"/>
+  <text x="130" y="240" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="58" font-weight="700">Figma</text>
+  <text x="716" y="700" fill="#EEF2ED" font-family="Arial, sans-serif" font-size="46" font-weight="700">GPT kit</text>
+</svg>
