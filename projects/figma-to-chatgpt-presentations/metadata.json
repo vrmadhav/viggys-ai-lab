@@ -6,7 +6,7 @@
   "dateUpdated": "2026-06-20",
   "description": "A dev-loadable Figma plugin that extracts presentation frames into a ChatGPT-ready deck style kit.",
   "summary": "A Figma plugin that turns selected deck frames into GPT instructions, knowledge files, design tokens, slide archetypes, and SVG references for building styled presentations in ChatGPT.",
-  "image": "/experiments/figma-slides-to-gpt.png",
+  "image": "/experiments/figma-slides-to-gpt.webp",
   "featured": true,
   "tags": ["Figma plugin", "ChatGPT", "Presentations", "Design systems"],
   "links": {
