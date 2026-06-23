@@ -4,8 +4,8 @@
   "rsc": false,
   "tsx": true,
   "tailwind": {
-    "css": "src/styles.css",
-    "baseColor": "slate",
+    "css": "src/app/globals.css",
+    "baseColor": "stone",
     "cssVariables": true,
     "prefix": ""
   },

@@ -9,6 +9,11 @@
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background: var(--figma-color-bg);
         color: var(--figma-color-text);
+        --radius-panel: 16px;
+        --radius-control: 10px;
+        --radius-pill: 999px;
+        --panel-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        --focus-shadow: 0 0 0 3px color-mix(in srgb, var(--figma-color-bg-brand) 18%, transparent);
       }
 
       * {
@@ -21,21 +26,21 @@
 
       main {
         display: grid;
-        gap: 14px;
+        gap: 16px;
         padding: 18px;
       }
 
       header,
       .panel {
         display: grid;
-        gap: 12px;
+        gap: 14px;
       }
 
       .eyebrow {
         color: var(--figma-color-text-secondary);
         font-size: 11px;
         font-weight: 700;
-        letter-spacing: 0;
+        letter-spacing: 0.12em;
         margin: 0;
         text-transform: uppercase;
       }
@@ -47,26 +52,30 @@
       }
 
       h1 {
-        font-size: 24px;
-        line-height: 1.15;
+        font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+        font-size: 26px;
+        font-weight: 500;
+        line-height: 1.08;
       }
 
       h2 {
-        font-size: 13px;
+        font-size: 14px;
+        font-weight: 700;
         line-height: 1.3;
       }
 
       p {
         color: var(--figma-color-text-secondary);
         font-size: 12px;
-        line-height: 1.55;
+        line-height: 1.6;
       }
 
       .panel {
         border: 1px solid var(--figma-color-border);
-        border-radius: 8px;
-        padding: 14px;
+        border-radius: var(--radius-panel);
+        padding: 16px;
         background: var(--figma-color-bg-secondary);
+        box-shadow: var(--panel-shadow);
       }
 
       .muted {
@@ -83,8 +92,8 @@
       .pill {
         flex: 0 0 auto;
         border: 1px solid var(--figma-color-border);
-        border-radius: 999px;
-        padding: 4px 8px;
+        border-radius: var(--radius-pill);
+        padding: 4px 10px;
         color: var(--figma-color-text-secondary);
         font-size: 11px;
         font-weight: 700;
@@ -92,15 +101,25 @@
 
       button {
         width: 100%;
-        min-height: 38px;
+        min-height: 40px;
         border: 1px solid var(--figma-color-bg-brand);
-        border-radius: 6px;
+        border-radius: var(--radius-pill);
         background: var(--figma-color-bg-brand);
         color: var(--figma-color-text-onbrand);
         cursor: pointer;
         font: inherit;
         font-size: 12px;
         font-weight: 700;
+        transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+      }
+
+      button:hover:not(:disabled) {
+        transform: translateY(-1px);
+      }
+
+      button:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-shadow);
       }
 
       button:disabled {
@@ -130,8 +149,8 @@
         display: grid;
         gap: 3px;
         border: 1px solid var(--figma-color-border);
-        border-radius: 6px;
-        padding: 10px;
+        border-radius: 12px;
+        padding: 12px;
         background: var(--figma-color-bg);
       }
 
@@ -171,19 +190,21 @@
 
       input[type="text"] {
         width: 100%;
-        min-height: 34px;
+        min-height: 36px;
         border: 1px solid var(--figma-color-border);
-        border-radius: 6px;
+        border-radius: var(--radius-control);
         padding: 0 10px;
         background: var(--figma-color-bg);
         color: var(--figma-color-text);
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
         font-size: 12px;
+        transition: border-color 160ms ease, box-shadow 160ms ease;
       }
 
       input[type="text"]:focus {
         outline: none;
         border-color: var(--figma-color-bg-brand);
+        box-shadow: var(--focus-shadow);
       }
 
       textarea {
@@ -191,7 +212,7 @@
         min-height: 180px;
         resize: vertical;
         border: 1px solid var(--figma-color-border);
-        border-radius: 6px;
+        border-radius: var(--radius-control);
         padding: 10px;
         background: var(--figma-color-bg);
         color: var(--figma-color-text);
@@ -261,7 +282,7 @@
 
       .progress {
         position: relative;
-        height: 6px;
+        height: 7px;
         width: 100%;
         overflow: hidden;
         border-radius: 999px;

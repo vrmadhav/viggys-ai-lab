@@ -4,34 +4,34 @@ import type { ComponentProps } from "react";
 export const mdxComponents = {
   h2: (props: ComponentProps<"h2">) => (
     <h2
-      className="mt-7 mb-2 font-display text-lg font-bold tracking-normal text-foreground first:mt-0"
+      className="mt-8 mb-3 font-display text-2xl font-medium tracking-normal text-foreground first:mt-0"
       {...props}
     />
   ),
   h3: (props: ComponentProps<"h3">) => (
     <h3
-      className="mt-5 mb-2 font-display text-base font-bold tracking-normal text-foreground"
+      className="mt-6 mb-3 font-display text-xl font-medium tracking-normal text-foreground"
       {...props}
     />
   ),
   p: (props: ComponentProps<"p">) => (
-    <p className="mt-3 text-sm leading-7 text-muted-foreground" {...props} />
+    <p className="mt-3 text-sm leading-7 text-muted-foreground sm:text-base" {...props} />
   ),
   ul: (props: ComponentProps<"ul">) => (
     <ul
-      className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-7 text-muted-foreground"
+      className="mt-3 list-disc space-y-2 pl-5 text-sm leading-7 text-muted-foreground sm:text-base"
       {...props}
     />
   ),
   ol: (props: ComponentProps<"ol">) => (
     <ol
-      className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-7 text-muted-foreground"
+      className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-7 text-muted-foreground sm:text-base"
       {...props}
     />
   ),
   a: (props: ComponentProps<"a">) => (
     <a
-      className="font-medium text-foreground underline underline-offset-4 hover:text-muted-foreground"
+      className="font-medium text-foreground underline underline-offset-4 transition-colors hover:text-muted-foreground"
       target="_blank"
       rel="noreferrer"
       {...props}
@@ -39,7 +39,7 @@ export const mdxComponents = {
   ),
   code: (props: ComponentProps<"code">) => (
     <code
-      className="rounded bg-muted px-1.5 py-0.5 font-mono text-[0.8em] text-foreground"
+      className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground"
       {...props}
     />
   ),

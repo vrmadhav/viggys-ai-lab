@@ -1,32 +1,9 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 import { AmbientBg } from "@/components/lab/AmbientBg";
 import { Header } from "@/components/lab/Header";
 import { Footer } from "@/components/lab/Footer";
-
-const satoshi = localFont({
-  variable: "--font-satoshi",
-  src: [
-    {
-      path: "../../public/fonts/satoshi/satoshi-400.woff2",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/satoshi/satoshi-500.woff2",
-      weight: "500",
-      style: "normal",
-    },
-    {
-      path: "../../public/fonts/satoshi/satoshi-700.woff2",
-      weight: "700",
-      style: "normal",
-    },
-  ],
-  display: "swap",
-});
 
 const themeScript = `
 (() => {
@@ -71,10 +48,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={satoshi.variable}>
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
-          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=zodiak@400,700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
         <Script id="theme-script" strategy="beforeInteractive">

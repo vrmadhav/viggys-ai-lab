@@ -2,8 +2,9 @@
 
 import type { ReactNode } from "react";
 import Image from "next/image";
-import { CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
 import type { Project, ProjectStatus } from "@/lib/projects";
+import { Badge } from "@/components/ui/badge";
 import { ProjectModal } from "./ProjectModal";
 
 function statusLabel(status: ProjectStatus) {
@@ -26,6 +27,22 @@ function formatDate(date: string) {
   }).format(parsed);
 }
 
+function projectAccentClasses(slug: string) {
+  if (slug.includes("ai-cost")) {
+    return "hover:border-project-emerald/50 hover:ring-project-emerald/20";
+  }
+
+  if (slug.includes("artist")) {
+    return "hover:border-project-blue/50 hover:ring-project-blue/20";
+  }
+
+  if (slug.includes("figma")) {
+    return "hover:border-project-orange/50 hover:ring-project-orange/20";
+  }
+
+  return "hover:border-project-neutral/40 hover:ring-project-neutral/15";
+}
+
 export function ProjectCard({
   project,
   children,
@@ -35,13 +52,15 @@ export function ProjectCard({
   children: ReactNode;
   priority?: boolean;
 }) {
+  const accentClasses = projectAccentClasses(project.slug);
+
   const trigger = (
     <button
       type="button"
       id={`project-${project.slug}`}
-      className="group flex min-h-96 scroll-mt-24 cursor-pointer flex-col overflow-hidden border border-border bg-background/70 text-left transition-colors hover:border-foreground/30 hover:bg-background"
+      className={`interactive-card group flex min-h-[27rem] scroll-mt-24 cursor-pointer flex-col overflow-hidden rounded-3xl border border-border bg-card text-left shadow-[var(--shadow-card)] ring-4 ring-transparent ${accentClasses}`}
     >
-      <div className="relative h-44 border-b border-border/70 bg-muted/40">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         {project.image ? (
           <Image
             src={project.image}
@@ -49,21 +68,21 @@ export function ProjectCard({
             fill
             loading={priority ? "eager" : "lazy"}
             sizes="(min-width: 1280px) 330px, (min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className="media-soft-hover object-cover"
           />
         ) : (
           <div className="absolute inset-0 bg-muted" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-background/10" />
-        <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span className="border border-border bg-background/75 px-2 py-1 backdrop-blur-md">
+        <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+        <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2">
+          <Badge variant="secondary" className="border-0 bg-card/90 text-muted-foreground shadow-sm backdrop-blur-md">
             {statusLabel(project.status)}
-          </span>
+          </Badge>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-5">
-        <h2 className="font-display text-xl font-bold tracking-normal text-foreground">
+      <div className="flex flex-1 flex-col p-6">
+        <h2 className="font-display text-xl font-medium leading-tight tracking-normal text-foreground">
           {project.title}
         </h2>
         <p className="mt-3 line-clamp-4 text-sm leading-6 text-muted-foreground">
@@ -75,7 +94,7 @@ export function ProjectCard({
             {project.tags.map((tag) => (
               <span
                 key={tag}
-                className="bg-muted px-2.5 py-1 text-xs text-muted-foreground"
+                className="rounded-md bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors duration-[var(--duration-base)] ease-[var(--ease-out)] group-hover:bg-surface-muted"
               >
                 {tag}
               </span>
@@ -83,11 +102,12 @@ export function ProjectCard({
           </div>
         )}
 
-        <div className="mt-auto flex items-center gap-2 pt-5 text-xs text-muted-foreground">
+        <div className="mt-auto flex items-center gap-2 border-t border-border pt-5 text-xs text-muted-foreground">
           <CalendarDays className="h-3.5 w-3.5" />
           <span>{formatDate(project.dateUpdated || project.dateCreated)}</span>
-          <span className="ml-auto transition-transform group-hover:translate-x-0.5">
-            Preview →
+          <span className="ml-auto inline-flex items-center gap-1 font-medium transition-colors group-hover:text-foreground">
+            Preview
+            <ArrowRight className="hover-nudge-x h-3 w-3" />
           </span>
         </div>
       </div>

@@ -1,13 +1,20 @@
 :root {
   color-scheme: light;
-  --bg: #f7f5ef;
-  --panel: #fffdf8;
-  --text: #191713;
-  --muted: #6f6a60;
-  --line: #ded8ca;
+  --bg: #fafaf9;
+  --panel: #ffffff;
+  --panel-muted: #f1f0ed;
+  --text: #1c1917;
+  --muted: #78716c;
+  --line: rgba(41, 37, 36, 0.12);
+  --input: rgba(41, 37, 36, 0.16);
   --accent: #136f63;
   --accent-strong: #0e5249;
-  --danger: #9b2c2c;
+  --danger: #b4233b;
+  --radius: 18px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --shadow: 0 1px 2px rgba(28, 25, 23, 0.04), 0 16px 44px -36px rgba(28, 25, 23, 0.35);
+  --focus: 0 0 0 4px rgba(19, 111, 99, 0.16);
 }
 
 * {
@@ -31,7 +38,7 @@ textarea {
 
 .shell {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   padding: 14px;
 }
 
@@ -59,10 +66,11 @@ dt,
 }
 
 .eyebrow {
-  margin: 0 0 2px;
+  margin: 0 0 4px;
   font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
 }
 
 h1,
@@ -72,37 +80,49 @@ p {
 }
 
 h1 {
-  font-size: 22px;
-  line-height: 1.1;
+  font-family: Georgia, ui-serif, serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.05;
 }
 
 h2 {
   font-size: 14px;
+  font-weight: 700;
 }
 
 .summary,
 .panel {
   border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--panel);
-  padding: 12px;
+  padding: 14px;
+  box-shadow: var(--shadow);
 }
 
 .summary strong {
   display: block;
   margin-top: 2px;
-  font-size: 21px;
+  font-family: Georgia, ui-serif, serif;
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.1;
 }
 
 .pill {
   border: 1px solid var(--line);
-  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  padding: 4px 9px;
   color: var(--muted);
+  background: var(--panel-muted);
   font-size: 12px;
+  font-weight: 700;
 }
 
 .pill.ready {
-  border-color: rgba(19, 111, 99, 0.35);
+  border-color: rgba(19, 111, 99, 0.28);
   color: var(--accent-strong);
+  background: rgba(19, 111, 99, 0.08);
 }
 
 .detected-grid {
@@ -114,6 +134,10 @@ h2 {
 
 .detected-grid > div {
   min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel-muted);
+  padding: 10px;
 }
 
 dt {
@@ -121,11 +145,11 @@ dt {
 }
 
 dd {
-  margin: 1px 0 0;
+  margin: 2px 0 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 650;
+  font-weight: 700;
 }
 
 #detectedModel {
@@ -136,20 +160,22 @@ dd {
 .note {
   margin-top: 10px;
   font-size: 12px;
+  line-height: 1.5;
 }
 
 .form {
   display: grid;
-  gap: 11px;
+  gap: 12px;
 }
 
 label,
 .field {
   display: grid;
-  gap: 5px;
+  gap: 6px;
   min-width: 0;
   color: var(--muted);
   font-size: 12px;
+  font-weight: 700;
 }
 
 .split > label {
@@ -161,11 +187,20 @@ select,
 textarea {
   width: 100%;
   min-width: 0;
-  border: 1px solid var(--line);
-  border-radius: 0;
-  background: #fff;
+  border: 1px solid var(--input);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
   color: var(--text);
-  padding: 8px;
+  padding: 9px 10px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: var(--focus);
 }
 
 textarea {
@@ -174,26 +209,38 @@ textarea {
 
 button {
   border: 1px solid var(--line);
-  background: #fff;
+  border-radius: var(--radius-pill);
+  background: #ffffff;
   color: var(--text);
   cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
 button:hover {
-  border-color: #a9a194;
+  border-color: rgba(41, 37, 36, 0.24);
+  transform: translateY(-1px);
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
 }
 
 .primary {
   border-color: var(--accent);
   background: var(--accent);
   color: white;
-  padding: 10px 12px;
+  padding: 11px 12px;
   font-weight: 700;
+}
+
+.primary:hover {
+  background: var(--accent-strong);
 }
 
 .secondary,
 .icon-button {
-  padding: 8px 10px;
+  padding: 8px 12px;
 }
 
 .link-button {
@@ -204,6 +251,10 @@ button:hover {
   font-size: 12px;
 }
 
+.link-button:hover {
+  transform: none;
+}
+
 .entries {
   display: grid;
   gap: 8px;
@@ -212,7 +263,7 @@ button:hover {
 
 .entry {
   border-top: 1px solid var(--line);
-  padding-top: 8px;
+  padding-top: 10px;
 }
 
 .entry strong {

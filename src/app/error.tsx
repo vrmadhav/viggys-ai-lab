@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Error({
   error,
@@ -15,25 +16,21 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
-      <div className="glass max-w-md border border-border p-8 text-center">
-        <h1 className="font-display text-xl font-bold">This page didn&apos;t load</h1>
+    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-[var(--shadow-card)]">
+        <h1 className="font-display text-2xl font-medium">This page didn&apos;t load</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Something glitched in the lab. Try again or head home.
         </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Button
             onClick={() => reset()}
-            className="bg-foreground px-4 py-2 text-sm font-medium text-background"
           >
             Try again
-          </button>
-          <Link
-            href="/"
-            className="border border-border bg-background/40 px-4 py-2 text-sm"
-          >
-            Go home
-          </Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/">Go home</Link>
+          </Button>
         </div>
       </div>
     </div>

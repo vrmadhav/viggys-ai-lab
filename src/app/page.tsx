@@ -19,17 +19,17 @@ export default function Home() {
   const projects = getAllProjects();
 
   return (
-    <main className="mx-auto max-w-[1400px] px-4 pt-6 pb-12 sm:px-6 lg:pt-8">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
+    <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:py-12">
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-12">
         <Sidebar />
 
         <div>
           {projects.length === 0 ? (
-            <div className="border border-border bg-background/50 p-8 text-sm text-muted-foreground">
+            <div className="rounded-3xl border border-border bg-card p-8 text-sm text-muted-foreground shadow-[var(--shadow-card)]">
               No projects yet.
             </div>
           ) : (
-            <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
               {projects.map((project, index) => {
                 const content = getProjectContent(project.slug);
 

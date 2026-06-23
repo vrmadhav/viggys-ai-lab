@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, Layers, Clock } from "lucide-react";
+import { ArrowRight, Clock, Github, Layers, Linkedin, Twitter } from "lucide-react";
 import { site } from "@/data/site";
 import { getStats } from "@/data/stats";
 
@@ -19,46 +19,38 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto space-y-5 pr-1">
-      {/* About */}
-      <section className="glass card-glow p-5">
-        <div className="label-sm mb-2 inline-flex items-center gap-2 border border-border bg-background px-2.5 py-1 text-muted-foreground">
-          <span className="h-1.5 w-1.5 bg-foreground" />
+    <aside className="space-y-8 pr-1 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto">
+      <section className="rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+        <div className="label-sm mb-4 inline-flex items-center gap-2 text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
           About the lab
         </div>
-        <p className="body-sm text-foreground/85">{site.about}</p>
+        <p className="text-sm leading-6 text-muted-foreground">{site.about}</p>
       </section>
 
-      {/* Stats */}
-      <section className="glass p-5">
-        <h3 className="label-sm mb-3 text-muted-foreground">
-          Stats
-        </h3>
+      <section>
+        <h3 className="label-sm mb-4 pl-1 text-muted-foreground">Stats</h3>
         <div className="grid grid-cols-2 gap-3">
           {statItems.map((s) => (
             <div
               key={s.label}
-              className="border border-border bg-background/50 p-3"
+              className="flex min-h-28 flex-col justify-center rounded-3xl border border-border bg-card p-4 shadow-[var(--shadow-card)]"
             >
-              <s.icon className="mb-1.5 h-3.5 w-3.5 text-foreground" />
-              <div className="font-display text-lg font-bold leading-tight">
+              <s.icon className="mb-2 h-4 w-4 text-muted-foreground" />
+              <div className="font-display text-xl font-medium leading-tight">
                 {s.value}
               </div>
-              <div className="mt-0.5 text-[11px] leading-tight text-muted-foreground">
+              <div className="mt-1 text-xs leading-tight text-muted-foreground">
                 {s.label}
               </div>
             </div>
           ))}
         </div>
-
       </section>
 
-      {/* Quick links */}
-      <section className="glass p-5">
-        <h3 className="label-sm mb-3 text-muted-foreground">
-          Quick Links
-        </h3>
-        <ul className="space-y-2 text-sm">
+      <section>
+        <h3 className="label-sm mb-4 pl-1 text-muted-foreground">Quick Links</h3>
+        <ul className="overflow-hidden rounded-3xl border border-border bg-card text-sm shadow-[var(--shadow-card)]">
           {[
             { label: "GitHub", href: site.links.github, icon: Github },
             { label: "LinkedIn", href: site.links.linkedin, icon: Linkedin },
@@ -69,13 +61,13 @@ export function Sidebar() {
                 href={l.href}
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center justify-between border border-transparent px-2 py-1.5 transition-colors hover:border-border hover:bg-background/60"
+                className="group flex items-center justify-between border-b border-border px-4 py-4 text-muted-foreground transition-colors duration-[var(--duration-base)] ease-[var(--ease-out)] last:border-0 hover:bg-accent hover:text-foreground"
               >
-                <span className="flex items-center gap-2">
-                  <l.icon className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                <span className="flex items-center gap-3">
+                  <l.icon className="h-4 w-4" />
                   {l.label}
                 </span>
-                <span className="text-muted-foreground transition-transform group-hover:translate-x-0.5">↗</span>
+                <ArrowRight className="hover-nudge-x h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
               </a>
             </li>
           ))}
