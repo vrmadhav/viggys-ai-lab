@@ -74,7 +74,6 @@ export function Sidebar() {
           {[
             { label: "GitHub", href: site.links.github, icon: Github },
             { label: "LinkedIn", href: site.links.linkedin, icon: Linkedin },
-            { label: "X / Twitter", href: site.links.twitter, icon: Twitter },
           ].map((l) => (
             <li key={l.label}>
               <a

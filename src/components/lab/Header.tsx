@@ -27,12 +27,6 @@ export function Header() {
 
         <nav className="flex items-center gap-2">
           <ThemeToggle />
-          <Button asChild variant="ghost" size="sm">
-            <a href={site.links.github} target="_blank" rel="noreferrer">
-              <Github className="h-4 w-4" />
-              <span className="hidden sm:inline">GitHub</span>
-            </a>
-          </Button>
           <Button asChild size="sm">
             <a href={`mailto:${site.email}`}>
               <Mail className="h-4 w-4" />

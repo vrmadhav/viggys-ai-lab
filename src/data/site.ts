@@ -10,12 +10,10 @@ export const site = {
     popularValue: "ChatGPT Slides",
     popularProjectSlug: "figma-to-chatgpt-presentations",
   },
-  email: "hello@viggylabs.com",
+  email: "hello@viggy.ai",
   links: {
-    github: "https://github.com/viggylabs",
-    linkedin: "https://www.linkedin.com/in/viggy",
-    twitter: "https://x.com/viggylabs",
-    rss: "/rss.xml",
+    github: "https://github.com/vrmadhav/viggys-ai-lab",
+    linkedin: "https://www.linkedin.com/in/vrmadhav23/",
     newsletter: "https://viggylabs.substack.com",
   },
 };
