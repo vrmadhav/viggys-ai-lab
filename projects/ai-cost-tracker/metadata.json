@@ -6,7 +6,7 @@
   "dateUpdated": "2026-06-18",
   "description": "A dev-loadable Chrome extension that helps creatives estimate AI usage costs by project.",
   "summary": "A Chrome extension MVP for tracking AI spend while working: detect popular creative AI tools, tag usage to projects, rate usefulness, and export a local ledger.",
-  "image": "/experiments/ai-cost-tracker.svg",
+  "image": "/experiments/ai-cost-tracker.webp",
   "featured": true,
   "tags": ["Chrome extension", "AI costs", "Creative tools", "MVP"],
   "links": {

@@ -29,18 +29,22 @@ function formatDate(date: string) {
 
 function projectAccentClasses(slug: string) {
   if (slug.includes("ai-cost")) {
-    return "hover:border-project-emerald/50 hover:ring-project-emerald/20";
+    return "project-accent-emerald hover:border-project-emerald/50 hover:ring-project-emerald/20";
   }
 
   if (slug.includes("artist")) {
-    return "hover:border-project-blue/50 hover:ring-project-blue/20";
+    return "project-accent-blue hover:border-project-blue/50 hover:ring-project-blue/20";
   }
 
-  if (slug.includes("figma")) {
-    return "hover:border-project-orange/50 hover:ring-project-orange/20";
+  if (slug.includes("chatgpt")) {
+    return "project-accent-magenta hover:border-project-magenta/50 hover:ring-project-magenta/20";
   }
 
-  return "hover:border-project-neutral/40 hover:ring-project-neutral/15";
+  if (slug.includes("claude")) {
+    return "project-accent-orange hover:border-project-orange/50 hover:ring-project-orange/20";
+  }
+
+  return "project-accent-neutral hover:border-project-neutral/40 hover:ring-project-neutral/15";
 }
 
 export function ProjectCard({

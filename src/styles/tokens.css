@@ -47,6 +47,7 @@
   --ring-offset-background: #fafaf9;
 
   --project-orange: #f97316;
+  --project-magenta: #cc0be1;
   --project-emerald: #10b981;
   --project-blue: #3b82f6;
   --project-neutral: #78716c;
@@ -109,6 +110,7 @@
   --ring-offset-background: #171412;
 
   --project-orange: #fb923c;
+  --project-magenta: #e879f9;
   --project-emerald: #34d399;
   --project-blue: #60a5fa;
   --project-neutral: #a8a29e;
@@ -155,6 +157,7 @@
   --color-surface-elevated: var(--surface-elevated);
   --color-surface-muted: var(--surface-muted);
   --color-project-orange: var(--project-orange);
+  --color-project-magenta: var(--project-magenta);
   --color-project-emerald: var(--project-emerald);
   --color-project-blue: var(--project-blue);
   --color-project-neutral: var(--project-neutral);

@@ -94,10 +94,31 @@
   }
 
   .interactive-card {
+    --project-card-accent: var(--project-neutral);
     transition-duration: var(--duration-slow);
     transition-property: background-color, border-color, box-shadow, color, transform;
     transition-timing-function: var(--ease-out);
     will-change: transform;
+  }
+
+  .project-accent-blue {
+    --project-card-accent: var(--project-blue);
+  }
+
+  .project-accent-emerald {
+    --project-card-accent: var(--project-emerald);
+  }
+
+  .project-accent-magenta {
+    --project-card-accent: var(--project-magenta);
+  }
+
+  .project-accent-orange {
+    --project-card-accent: var(--project-orange);
+  }
+
+  .project-accent-neutral {
+    --project-card-accent: var(--project-neutral);
   }
 
   .interactive-control {
@@ -124,7 +145,14 @@
 
   @media (hover: hover) and (pointer: fine) {
     .interactive-card:hover {
-      box-shadow: var(--shadow-card-hover);
+      box-shadow:
+        var(--tw-inset-shadow),
+        var(--tw-inset-ring-shadow),
+        var(--tw-ring-offset-shadow),
+        var(--tw-ring-shadow),
+        var(--shadow-card-hover),
+        0 0 0 1px color-mix(in oklab, var(--project-card-accent) 14%, transparent),
+        0 0 34px -18px color-mix(in oklab, var(--project-card-accent) 64%, transparent);
       transform: translateY(-3px);
     }
 

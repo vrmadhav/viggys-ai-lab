@@ -1,20 +1,25 @@
-import { ArrowRight, Clock, Github, Layers, Linkedin, Twitter } from "lucide-react";
+import { ArrowRight, Flame, Github, Layers, Linkedin, Twitter } from "lucide-react";
 import { site } from "@/data/site";
 import { getStats } from "@/data/stats";
+import { getProjectBySlug } from "@/lib/projects";
+import { ProjectOpenLink } from "./ProjectOpenLink";
 
 export function Sidebar() {
   const stats = getStats();
+  const popularProject = getProjectBySlug(site.sidebarStats.popularProjectSlug);
 
   const statItems = [
     {
       label: "Projects",
       value: `${stats.projectsPublished}`,
       icon: Layers,
+      slug: null,
     },
     {
-      label: "Latest",
-      value: stats.latestProject ? "Updated" : "Soon",
-      icon: Clock,
+      label: site.sidebarStats.popularLabel,
+      value: site.sidebarStats.popularValue,
+      icon: Flame,
+      slug: popularProject?.slug ?? null,
     },
   ];
 
@@ -22,7 +27,6 @@ export function Sidebar() {
     <aside className="space-y-8 pr-1 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto">
       <section className="rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="label-sm mb-4 inline-flex items-center gap-2 text-muted-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
           About the lab
         </div>
         <p className="text-sm leading-6 text-muted-foreground">{site.about}</p>
@@ -31,20 +35,36 @@ export function Sidebar() {
       <section>
         <h3 className="label-sm mb-4 pl-1 text-muted-foreground">Stats</h3>
         <div className="grid grid-cols-2 gap-3">
-          {statItems.map((s) => (
-            <div
-              key={s.label}
-              className="flex min-h-28 flex-col justify-center rounded-3xl border border-border bg-card p-4 shadow-[var(--shadow-card)]"
-            >
-              <s.icon className="mb-2 h-4 w-4 text-muted-foreground" />
-              <div className="font-display text-xl font-medium leading-tight">
-                {s.value}
+          {statItems.map((s) => {
+            const Icon = s.icon;
+            const content = (
+              <>
+                <Icon className="mb-2 h-4 w-4 text-muted-foreground" />
+                <div className="font-display text-xl font-medium leading-tight">
+                  {s.value}
+                </div>
+                <div className="mt-1 text-xs leading-tight text-muted-foreground">
+                  {s.label}
+                </div>
+              </>
+            );
+            const className =
+              "flex min-h-28 flex-col justify-center rounded-3xl border border-border bg-card p-4 text-left shadow-[var(--shadow-card)]";
+
+            return s.slug ? (
+              <ProjectOpenLink
+                key={s.label}
+                slug={s.slug}
+                className={`${className} interactive-control hover:border-foreground/20 hover:shadow-[var(--shadow-card-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
+              >
+                {content}
+              </ProjectOpenLink>
+            ) : (
+              <div key={s.label} className={className}>
+                {content}
               </div>
-              <div className="mt-1 text-xs leading-tight text-muted-foreground">
-                {s.label}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
