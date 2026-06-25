@@ -27,7 +27,7 @@ export function Sidebar() {
     <aside className="space-y-8 pr-1 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto">
       <section className="rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="label-sm mb-4 inline-flex items-center gap-2 text-muted-foreground">
-          About the lab
+          About
         </div>
         <p className="text-sm leading-6 text-muted-foreground">{site.about}</p>
       </section>
@@ -69,7 +69,7 @@ export function Sidebar() {
       </section>
 
       <section>
-        <h3 className="label-sm mb-4 pl-1 text-muted-foreground">Quick Links</h3>
+        <h3 className="label-sm mb-4 pl-1 text-muted-foreground">Links</h3>
         <ul className="overflow-hidden rounded-3xl border border-border bg-card text-sm shadow-[var(--shadow-card)]">
           {[
             { label: "GitHub", href: site.links.github, icon: Github },

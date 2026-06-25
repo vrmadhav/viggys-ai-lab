@@ -13,7 +13,7 @@ export function Footer() {
           <a className="transition-colors hover:text-foreground" href={site.links.rss}>RSS</a>
           <a className="transition-colors hover:text-foreground" href={site.links.newsletter} target="_blank" rel="noreferrer">Newsletter</a>
         </nav>
-        <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Viggy&apos;s AI Lab</p>
+        <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Viggy&apos;s Lab</p>
       </div>
     </footer>
   );

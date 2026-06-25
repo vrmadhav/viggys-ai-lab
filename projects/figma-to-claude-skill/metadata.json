@@ -5,7 +5,7 @@
   "dateCreated": "2026-06-19",
   "dateUpdated": "2026-06-19",
   "description": "A dev-loadable Figma plugin that extracts presentation frames into a Claude Skill scaffold.",
-  "summary": "A Figma plugin MVP that turns selected deck frames into AI-usable style instructions: typography, color tokens, slide archetypes, and SVG-only graphic references.",
+  "summary": "A Figma plugin that turns selected deck frames into Claude-usable style instructions: typography, color tokens, slide archetypes, and SVG-only graphic references.",
   "image": "/experiments/figma-slides-to-claude.webp",
   "featured": true,
   "tags": ["Figma plugin", "Claude Skill", "Presentations", "Design systems"],

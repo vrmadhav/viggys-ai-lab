@@ -93,19 +93,6 @@ export function ProjectCard({
           {project.summary || project.description || "Project notes coming soon."}
         </p>
 
-        {project.tags.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-md bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors duration-[var(--duration-base)] ease-[var(--ease-out)] group-hover:bg-surface-muted"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
-
         <div className="mt-auto flex items-center gap-2 border-t border-border pt-5 text-xs text-muted-foreground">
           <CalendarDays className="h-3.5 w-3.5" />
           <span>{formatDate(project.dateUpdated || project.dateCreated)}</span>

@@ -1,4 +1,4 @@
-# Viggy's AI Lab Design System
+# Viggy's Lab Design System
 
 This system translates the Figma Make reference into production patterns for the archive site and shipped source UIs. It should feel warm, editorial, and calm: soft stone surfaces, white elevated panels, rounded cards, serif display type, and restrained motion.
 

@@ -1,4 +1,4 @@
-# Viggy's AI Lab
+# Viggy's Lab
 
 A small Next.js site for publishing projects, prototypes, experiments, and build notes.
 

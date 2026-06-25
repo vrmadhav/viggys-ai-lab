@@ -26,12 +26,12 @@ export const metadata: Metadata = {
         ? `https://${process.env.VERCEL_URL}`
         : "http://localhost:3000"),
   ),
-  title: "Viggy's AI Lab — projects and experiments",
+  title: "Viggy's Lab — projects and experiments",
   description:
     "A living archive of small apps, prototypes, experiments, and build notes.",
   authors: [{ name: "Viggy" }],
   openGraph: {
-    title: "Viggy's AI Lab",
+    title: "Viggy's Lab",
     description:
       "Small apps, prototypes, experiments, and build notes from Viggy.",
     type: "website",

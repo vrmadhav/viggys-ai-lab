@@ -1,10 +1,10 @@
 export const site = {
-  name: "Viggy's AI Lab",
-  fullName: "Viggy's AI Lab",
+  name: "Viggy's Lab",
+  fullName: "Viggy's Lab",
   tagline:
     "A living archive of small apps, prototypes, experiments, and build notes.",
   about: 
-    "Founded in June 2026, this lab is a curated record of experiments, prototypes, and applied AI product work.",
+    "Founded in June 2026, this is a curated record of experiments, prototypes, and applied AI work.",
   sidebarStats: {
     popularLabel: "Most popular",
     popularValue: "ChatGPT Slides",
