@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import {
-  SPARKLE_DUST_TUNING_EVENT,
   sparkleDustConfig,
   type RgbColor,
   type SparkleTheme,
@@ -325,30 +324,6 @@ export function SparkleDust() {
       });
     }
 
-    function refreshTuning() {
-      const alpha = sparkleDustConfig.alpha[theme];
-
-      syncParticles();
-
-      particles = particles.map((particle) => ({
-        ...particle,
-        baseSize: sparkleDustConfig.baseSize * randomBetween(0.42, 1.45),
-        baseAlpha: randomBetween(alpha.min, alpha.max),
-        twinkleSpeed: randomBetween(
-          sparkleDustConfig.twinkle.speedMin,
-          sparkleDustConfig.twinkle.speedMax,
-        ),
-        driftFreq: randomBetween(
-          sparkleDustConfig.drift.swayFrequencyMin,
-          sparkleDustConfig.drift.swayFrequencyMax,
-        ),
-        driftAmp: randomBetween(
-          sparkleDustConfig.drift.swayAmplitudeMin,
-          sparkleDustConfig.drift.swayAmplitudeMax,
-        ),
-      }));
-    }
-
     function onPointerMove(event: PointerEvent) {
       const rect = canvasElement.getBoundingClientRect();
 
@@ -398,7 +373,6 @@ export function SparkleDust() {
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerleave", onPointerLeave);
     window.addEventListener(THEME_CHANGE_EVENT, refreshTheme);
-    window.addEventListener(SPARKLE_DUST_TUNING_EVENT, refreshTuning);
 
     animationFrame = window.requestAnimationFrame(loop);
 
@@ -411,7 +385,6 @@ export function SparkleDust() {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerleave", onPointerLeave);
       window.removeEventListener(THEME_CHANGE_EVENT, refreshTheme);
-      window.removeEventListener(SPARKLE_DUST_TUNING_EVENT, refreshTuning);
     };
   }, []);
 

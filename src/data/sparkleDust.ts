@@ -48,28 +48,7 @@ export type SparkleDustConfig = {
   };
 };
 
-export const SPARKLE_DUST_TUNING_EVENT = "lab:sparkle-dust-tuning";
-
-export function cloneSparkleDustConfig(
-  config: SparkleDustConfig,
-): SparkleDustConfig {
-  return {
-    ...config,
-    alpha: {
-      light: { ...config.alpha.light },
-      dark: { ...config.alpha.dark },
-    },
-    colors: {
-      light: config.colors.light.map((color) => [...color] as RgbColor),
-      dark: config.colors.dark.map((color) => [...color] as RgbColor),
-    },
-    twinkle: { ...config.twinkle },
-    drift: { ...config.drift },
-    mouse: { ...config.mouse },
-  };
-}
-
-export const sparkleDustDefaults = {
+export const sparkleDustConfig = {
   // Particles per 10,000 CSS pixels. Raise this for denser dust.
   density: 1.25,
   minParticles: 114,
@@ -135,7 +114,3 @@ export const sparkleDustDefaults = {
     sizeBoost: 0.72,
   },
 } satisfies SparkleDustConfig;
-
-export const sparkleDustConfig: SparkleDustConfig = cloneSparkleDustConfig(
-  sparkleDustDefaults,
-);
