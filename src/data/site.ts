@@ -14,6 +14,7 @@ export const site = {
   links: {
     github: "https://github.com/vrmadhav/viggys-ai-lab",
     linkedin: "https://www.linkedin.com/in/vrmadhav23/",
+    rss: "https://viggylabs.substack.com/feed",
     newsletter: "https://viggylabs.substack.com",
   },
 };

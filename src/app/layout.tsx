@@ -60,11 +60,13 @@ export default function RootLayout({
           {themeScript}
         </Script>
       </head>
-      <body>
+      <body className="relative min-h-screen overflow-x-hidden isolate">
         <AmbientBg />
         <Header />
-        {children}
-        <Footer />
+        <div className="relative z-10">
+          {children}
+          <Footer />
+        </div>
       </body>
     </html>
   );
