@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import {
   sparkleDustConfig,
-  type RgbColor,
+  type HexColor,
   type SparkleTheme,
 } from "@/data/sparkleDust";
 
@@ -12,7 +12,7 @@ type Particle = {
   y: number;
   baseSize: number;
   size: number;
-  color: RgbColor;
+  color: HexColor;
   alpha: number;
   baseAlpha: number;
   vx: number;
@@ -49,6 +49,15 @@ function randomBetween(min: number, max: number) {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+function hexToRgb(hex: HexColor) {
+  const normalized = hex.replace("#", "");
+  const red = Number.parseInt(normalized.slice(0, 2), 16);
+  const green = Number.parseInt(normalized.slice(2, 4), 16);
+  const blue = Number.parseInt(normalized.slice(4, 6), 16);
+
+  return [red, green, blue] as const;
 }
 
 function getTheme(): SparkleTheme {
@@ -207,7 +216,7 @@ function drawParticle(
   particle: Particle,
   theme: SparkleTheme,
 ) {
-  const [red, green, blue] = particle.color;
+  const [red, green, blue] = hexToRgb(particle.color);
   const themeAlpha = sparkleDustConfig.alpha[theme];
   const radius = particle.size;
 

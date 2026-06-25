@@ -1,6 +1,6 @@
 export type SparkleTheme = "light" | "dark";
 
-export type RgbColor = readonly [number, number, number];
+export type HexColor = `#${string}`;
 
 export type SparkleDustConfig = {
   density: number;
@@ -18,7 +18,7 @@ export type SparkleDustConfig = {
       core: number;
     }
   >;
-  colors: Record<SparkleTheme, readonly RgbColor[]>;
+  colors: Record<SparkleTheme, readonly HexColor[]>;
   twinkle: {
     alphaFloor: number;
     sizeMin: number;
@@ -71,20 +71,8 @@ export const sparkleDustConfig = {
     },
   },
   colors: {
-    light: [
-      [190, 24, 147],
-      [219, 39, 119],
-      [168, 85, 247],
-      [244, 114, 182],
-      [251, 207, 232],
-    ],
-    dark: [
-      [244, 114, 182],
-      [232, 121, 249],
-      [216, 180, 254],
-      [251, 207, 232],
-      [192, 132, 252],
-    ],
+    light: ["#be1893", "#db2777", "#a855f7", "#6679db", "#769ae4"],
+    dark: ["#f472b6", "#e879f9", "#d8b4fe", "#6363ea", "#a6b9e2"],
   },
   twinkle: {
     alphaFloor: 0.42,
