@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import { AmbientBg } from "@/components/lab/AmbientBg";
+import { AppChrome } from "@/components/lab/AppChrome";
 import { Header } from "@/components/lab/Header";
 import { Footer } from "@/components/lab/Footer";
 
@@ -60,7 +60,7 @@ export default function RootLayout({
         </Script>
       </head>
       <body className="relative min-h-screen overflow-x-hidden isolate">
-        <AmbientBg />
+        <AppChrome />
         <Header />
         <div className="relative z-10">
           {children}

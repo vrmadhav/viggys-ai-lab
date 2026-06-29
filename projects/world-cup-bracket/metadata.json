@@ -1,0 +1,15 @@
+{
+  "title": "World Cup Bracket",
+  "slug": "world-cup-bracket",
+  "status": "live",
+  "dateCreated": "2026-06-28",
+  "dateUpdated": "2026-06-28",
+  "description": "A live-updating FIFA World Cup 2026 knockout bracket with predictions for unplayed matches.",
+  "summary": "A compact World Cup knockout bracket that refreshes from the latest match feed on load, locks completed results, and lets you click through predictions for the rest of the tournament.",
+  "image": "/experiments/world-cup-bracket.svg",
+  "featured": true,
+  "tags": ["World Cup", "Sports", "Bracket", "Predictions"],
+  "links": {
+    "demo": "/apps/world-cup-bracket"
+  }
+}
