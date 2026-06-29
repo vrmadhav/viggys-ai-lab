@@ -89,14 +89,18 @@ function formatUpdatedAt(value: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return "Not synced yet";
 
-  return new Intl.DateTimeFormat("en-US", {
+  const parts = new Intl.DateTimeFormat("en-US", {
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
     timeZone: "America/Los_Angeles",
     timeZoneName: "short",
-  }).format(parsed);
+  }).formatToParts(parsed);
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  return `${getPart("month")} ${getPart("day")}, ${getPart("hour")}:${getPart("minute")} ${getPart("dayPeriod")} ${getPart("timeZoneName")}`;
 }
 
 function scoreParts(score: string | null): [string | null, string | null] {
