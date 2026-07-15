@@ -65,8 +65,8 @@ export function ProjectModal({
   return (
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="max-h-[88vh] w-[calc(100vw-2rem)] max-w-3xl gap-0 overflow-hidden border-border bg-background p-0">
-        <div className="border-b border-border bg-card px-6 py-6 pr-16 sm:px-8">
+      <DialogContent className="flex max-h-[88vh] w-[calc(100vw-2rem)] max-w-3xl flex-col gap-0 overflow-hidden border-border bg-background p-0">
+        <div className="shrink-0 border-b border-border bg-card px-6 py-6 pr-16 sm:px-8">
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <Badge variant="secondary">
               {statusLabel(project.status)}
@@ -116,7 +116,9 @@ export function ProjectModal({
           )}
         </div>
 
-        <div className="overflow-y-auto p-6 sm:p-8">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto p-6 sm:p-8">
+          {children}
+        </div>
 
         <DialogClose className="sr-only">Close</DialogClose>
       </DialogContent>
