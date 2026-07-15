@@ -3,16 +3,8 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { ArrowRight, CalendarDays } from "lucide-react";
-import type { Project, ProjectStatus } from "@/lib/projects";
-import { Badge } from "@/components/ui/badge";
+import type { Project } from "@/lib/projects";
 import { ProjectModal } from "./ProjectModal";
-
-function statusLabel(status: ProjectStatus) {
-  if (status === "live") return "Live";
-  if (status === "in-progress") return "In progress";
-  if (status === "archived") return "Archived";
-  return "Planned";
-}
 
 function formatDate(date: string) {
   if (!date) return "Undated";
@@ -78,11 +70,6 @@ export function ProjectCard({
           <div className="absolute inset-0 bg-muted" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
-        <div className="absolute left-4 top-4 flex flex-wrap items-center gap-2">
-          <Badge variant="secondary" className="border-0 bg-card/90 text-muted-foreground shadow-sm backdrop-blur-md">
-            {statusLabel(project.status)}
-          </Badge>
-        </div>
       </div>
 
       <div className="flex flex-1 flex-col p-6">

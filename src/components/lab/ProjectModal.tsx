@@ -17,14 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Project, ProjectStatus } from "@/lib/projects";
-
-function statusLabel(status: ProjectStatus) {
-  if (status === "live") return "Live";
-  if (status === "in-progress") return "In progress";
-  if (status === "archived") return "Archived";
-  return "Planned";
-}
+import type { Project } from "@/lib/projects";
 
 function linkItems(project: Project) {
   return [
@@ -67,16 +60,13 @@ export function ProjectModal({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="flex max-h-[88vh] w-[calc(100vw-2rem)] max-w-3xl flex-col gap-0 overflow-hidden border-border bg-background p-0">
         <div className="shrink-0 border-b border-border bg-card px-6 py-6 pr-16 sm:px-8">
-          <div className="mb-4 flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">
-              {statusLabel(project.status)}
-            </Badge>
-            {project.dateUpdated || project.dateCreated ? (
+          {project.dateUpdated || project.dateCreated ? (
+            <div className="mb-4 flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="text-muted-foreground">
                 {project.dateUpdated || project.dateCreated}
               </Badge>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
 
           <DialogTitle className="font-display text-3xl font-medium leading-tight tracking-normal sm:text-4xl">
             {project.title}
