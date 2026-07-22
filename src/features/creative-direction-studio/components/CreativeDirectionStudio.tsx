@@ -115,10 +115,10 @@ export function CreativeDirectionStudio() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string>();
   const [contradiction, setContradiction] = useState<IntentUpdateResult["contradiction"]>();
-  const [offerExploration, setOfferExploration] = useState(false);
   const [combineIds, setCombineIds] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [leftPanelTab, setLeftPanelTab] = useState<"chat" | "intent">("chat");
   const [hydrated, setHydrated] = useState(false);
   const [diagnostics, setDiagnostics] = useState<Diagnostics>();
   const requestVersion = useRef(0);
@@ -142,7 +142,7 @@ export function CreativeDirectionStudio() {
           setSelectedDirectionId(stored.selectedDirectionId);
           setLockedTraits(stored.lockedTraits ?? []);
           setGuidancePreference(stored.guidancePreference ?? "guide");
-          setStatus(stored.selectedDirectionId ? "refining" : stored.directions?.length ? "ready-to-explore" : "gathering-context");
+          setStatus(stored.selectedDirectionId ? "refining" : stored.directions?.length || stored.workingIntent?.objective || stored.workingIntent?.coreIdea ? "ready-to-explore" : "gathering-context");
         }
       } catch {
         setError("Saved session data could not be restored, so a fresh workspace was opened.");
@@ -337,7 +337,6 @@ export function CreativeDirectionStudio() {
       const result = await api<IntentUpdateResult>("/api/creative-direction-studio/intent", { previousIntent: workingIntent, contribution });
       setWorkingIntent(result.updatedIntent);
       if (!selectedDirectionId) setStatus(result.status);
-      setOfferExploration(result.shouldOfferExploration);
       setContradiction(result.contradiction);
       setConversation((current) => [...current, { id: id(), role: "assistant", content: result.assistantMessage, createdAt: new Date().toISOString() }]);
       trackStudioEvent("working_intent_updated");
@@ -386,12 +385,12 @@ export function CreativeDirectionStudio() {
     setStatus("gathering-context");
     setError(undefined);
     setContradiction(undefined);
-    setOfferExploration(false);
     localStorage.removeItem(STORAGE_KEY);
     trackStudioEvent("session_reset");
   }
 
   const recentConversation = useMemo(() => conversation.slice(-5), [conversation]);
+  const canExplore = Boolean(workingIntent.objective || workingIntent.coreIdea);
 
   return (
     <main className="min-h-screen bg-[#f3f0ea] text-[#24211d]">
@@ -409,18 +408,46 @@ export function CreativeDirectionStudio() {
       </header>
 
       <div className="mx-auto grid max-w-[1600px] gap-5 px-3 py-4 sm:px-6 lg:grid-cols-[390px_minmax(0,1fr)] lg:px-8 lg:py-6">
-        <aside className="order-2 min-w-0 space-y-3 lg:order-1">
-          <ChatInterface messages={recentConversation} loading={isThinking} draft={draft} setDraft={setDraft} onSubmit={() => submit()} disabled={isThinking || isGenerating} placeholder={selectedDirection ? "Refine this direction…" : "Add an idea, constraint, preference, or reaction…"} />
+        <aside className="order-1 min-w-0 space-y-3 lg:sticky lg:top-[77px] lg:self-start">
+          <div>
+            <div role="tablist" aria-label="Creative direction workspace" className="flex items-end gap-1 border-b border-black/10 px-1">
+              <button
+                id="chat-tab"
+                role="tab"
+                aria-selected={leftPanelTab === "chat"}
+                aria-controls="chat-panel"
+                onClick={() => setLeftPanelTab("chat")}
+                className={`relative px-3 pb-2.5 pt-1 text-sm font-semibold transition ${leftPanelTab === "chat" ? "text-[#24211d] after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-[#d85432]" : "text-black/40 hover:text-black/65"}`}
+              >
+                Chat with AI
+              </button>
+              <button
+                id="intent-tab"
+                role="tab"
+                aria-selected={leftPanelTab === "intent"}
+                aria-controls="intent-panel"
+                onClick={() => setLeftPanelTab("intent")}
+                className={`relative px-3 pb-2.5 pt-1 text-sm font-semibold transition ${leftPanelTab === "intent" ? "text-[#24211d] after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:bg-[#d85432]" : "text-black/40 hover:text-black/65"}`}
+              >
+                Edit intent
+              </button>
+            </div>
+            <div className="pt-3">
+              {leftPanelTab === "chat" ? (
+                <ChatInterface messages={recentConversation} loading={isThinking} draft={draft} setDraft={setDraft} onSubmit={() => submit()} disabled={isThinking || isGenerating} placeholder={selectedDirection ? "Refine this direction…" : "Add an idea, constraint, preference, or reaction…"} />
+              ) : (
+                <WorkingIntentPanel intent={workingIntent} onUpdate={updateIntentEntry} selectedDirection={selectedDirection} lockedTraits={lockedTraits} onToggleLock={toggleLock} />
+              )}
+            </div>
+          </div>
+          {!selectedDirection && <button onClick={explore} disabled={isGenerating || !canExplore} className="group flex w-full items-center justify-between rounded-2xl bg-[#d85432] px-4 py-3.5 text-left text-sm font-semibold text-white shadow-[0_10px_30px_-16px_rgba(216,84,50,.8)] transition hover:bg-[#c74728] disabled:cursor-not-allowed disabled:opacity-40"><span className="inline-flex items-center gap-2">{isGenerating ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Explore directions</span><ArrowUp className="h-4 w-4 rotate-45 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></button>}
           {combineIds.length >= 2 && !selectedDirection && <button onClick={() => combineDirections()} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#24211d] px-4 py-3 text-sm font-medium text-white"><Merge className="h-4 w-4" /> Combine {combineIds.length} directions</button>}
           {error && <div role="alert" className="flex items-start gap-2 rounded-2xl border border-[#b4422d]/25 bg-[#fff4ef] p-3 text-sm text-[#8e2e1f]"><CircleAlert className="mt-0.5 h-4 w-4 shrink-0" /><span className="flex-1">{error}</span><button onClick={() => setError(undefined)} aria-label="Dismiss error"><X className="h-4 w-4" /></button></div>}
           {contradiction && <div className="rounded-2xl border border-amber-600/25 bg-amber-50 p-4"><p className="text-xs font-semibold uppercase tracking-[.15em] text-amber-800">Creative tension</p><p className="mt-2 text-sm leading-6">{contradiction.description}</p>{contradiction.options && <div className="mt-3 flex flex-wrap gap-1.5">{contradiction.options.map((option) => <button key={option} onClick={() => submit(option)} className="rounded-full border border-amber-700/20 bg-white px-2.5 py-1 text-xs">{option}</button>)}</div>}</div>}
-          <WorkingIntentPanel intent={workingIntent} onUpdate={updateIntentEntry} selectedDirection={selectedDirection} lockedTraits={lockedTraits} onToggleLock={toggleLock} />
-          {offerExploration && !selectedDirection && <button onClick={explore} disabled={isGenerating} className="group flex w-full items-center justify-between rounded-2xl bg-[#d85432] px-4 py-3.5 text-left text-sm font-semibold text-white shadow-[0_10px_30px_-16px_rgba(216,84,50,.8)] transition hover:bg-[#c74728] disabled:opacity-60"><span className="inline-flex items-center gap-2">{isGenerating ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Explore three directions</span><ArrowUp className="h-4 w-4 rotate-45 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></button>}
-          <GuidancePreference value={guidancePreference} onChange={(value) => { setGuidancePreference(value); trackStudioEvent("guidance_preference_changed", { value }); }} />
-          {guidancePreference !== "create" && selectedDirection && <GuidanceCard direction={selectedDirection} teach={guidancePreference === "teach"} />}
+          {selectedDirection && <GuidanceCard direction={selectedDirection} teach={false} />}
         </aside>
 
-        <section className="order-1 min-w-0 lg:order-2 lg:sticky lg:top-[77px] lg:self-start">
+        <section className="order-2 min-w-0 lg:sticky lg:top-[77px] lg:self-start">
           {selectedDirection ? (
             <RefinementCanvas direction={selectedDirection} image={selectedImage} isGenerating={isGenerating || selectedDirection.status === "generating"} onBack={() => { setSelectedDirectionId(undefined); setSelectedImageId(undefined); setStatus("ready-to-explore"); }} onShowPrompt={() => { setShowPrompt((value) => !value); trackStudioEvent("generation_prompt_viewed"); }} showPrompt={showPrompt} onRetry={() => { const version = ++requestVersion.current; setDirections((current) => current.map((item) => item.id === selectedDirection.id ? { ...item, status: "generating" } : item)); void generatePreview(selectedDirection, version); }} />
           ) : directions.length ? (
@@ -445,7 +472,7 @@ export function CreativeDirectionStudio() {
 function containsAction(text: string, values: string[]) { return values.some((value) => text.includes(value)); }
 
 function ChatInterface({ messages, loading, draft, setDraft, onSubmit, disabled, placeholder }: { messages: ConversationMessage[]; loading: boolean; draft: string; setDraft: (value: string) => void; onSubmit: () => void; disabled: boolean; placeholder: string }) {
-  return <section className="overflow-hidden rounded-3xl border border-black/10 bg-[#fffdf8] shadow-[0_18px_60px_-40px_rgba(0,0,0,.5)]"><div className="border-b border-black/10 px-4 py-3"><p className="text-xs font-semibold uppercase tracking-[.16em] text-black/40">Creative conversation</p></div><div className="max-h-[36vh] min-h-32 space-y-3 overflow-y-auto p-4">{messages.length ? messages.map((message) => <div key={message.id} className={`text-sm leading-6 ${message.role === "user" ? "ml-8 rounded-2xl rounded-br-md bg-[#24211d] px-3.5 py-2.5 text-white" : "mr-5 border-l-2 border-[#d85432] pl-3 text-black/70"}`}><span className={`mb-0.5 block text-[9px] font-semibold uppercase tracking-wider ${message.role === "user" ? "text-white/45" : "text-black/30"}`}>{message.role === "user" ? "You" : "Studio"}</span>{message.content}</div>) : <p className="py-5 text-center text-xs leading-5 text-black/40">Your ideas, reactions, and the studio’s interpretation will stay together here.</p>}{loading && <div role="status" className="flex items-center gap-2 border-l-2 border-[#d85432] pl-3 text-xs text-black/45"><LoaderCircle className="h-3.5 w-3.5 animate-spin" />Interpreting how that changes the intent…</div>}</div><div className="border-t border-black/10 p-2"><label className="sr-only" htmlFor="studio-context">Add context</label><textarea id="studio-context" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); onSubmit(); } }} placeholder={placeholder} className="min-h-24 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 outline-none placeholder:text-black/35" /><div className="flex items-center justify-between px-2 pb-1"><span className="text-[10px] text-black/35">Enter to send · Shift + Enter for a new line</span><button disabled={disabled || !draft.trim()} onClick={onSubmit} className="grid h-9 w-9 place-items-center rounded-full bg-[#24211d] text-white transition hover:scale-105 disabled:opacity-30" aria-label="Add context">{disabled ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}</button></div></div></section>;
+  return <section id="chat-panel" role="tabpanel" aria-labelledby="chat-tab" className="flex h-[clamp(360px,52vh,480px)] flex-col overflow-hidden rounded-3xl border border-black/10 bg-[#fffdf8] shadow-[0_18px_60px_-40px_rgba(0,0,0,.5)]"><div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">{messages.length ? messages.map((message) => <div key={message.id} className={`text-sm leading-6 ${message.role === "user" ? "ml-8 rounded-2xl rounded-br-md bg-[#24211d] px-3.5 py-2.5 text-white" : "mr-5 border-l-2 border-[#d85432] pl-3 text-black/70"}`}><span className={`mb-0.5 block text-[9px] font-semibold uppercase tracking-wider ${message.role === "user" ? "text-white/45" : "text-black/30"}`}>{message.role === "user" ? "You" : "Studio"}</span>{message.content}</div>) : <p className="py-5 text-center text-xs leading-5 text-black/40">Your ideas, reactions, and the studio’s interpretation will stay together here.</p>}{loading && <div role="status" className="flex items-center gap-2 border-l-2 border-[#d85432] pl-3 text-xs text-black/45"><LoaderCircle className="h-3.5 w-3.5 animate-spin" />Interpreting how that changes the intent…</div>}</div><div className="shrink-0 border-t border-black/10 p-2"><label className="sr-only" htmlFor="studio-context">Add context</label><textarea id="studio-context" value={draft} onChange={(event) => setDraft(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); onSubmit(); } }} placeholder={placeholder} className="min-h-20 w-full resize-none bg-transparent px-3 py-2 text-sm leading-6 outline-none placeholder:text-black/35" /><div className="flex items-center justify-between px-2 pb-1"><span className="text-[10px] text-black/35">Enter to send · Shift + Enter for a new line</span><button disabled={disabled || !draft.trim()} onClick={onSubmit} className="grid h-9 w-9 place-items-center rounded-full bg-[#24211d] text-white transition hover:scale-105 disabled:opacity-30" aria-label="Add context">{disabled ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}</button></div></div></section>;
 }
 
 function EmptyCanvas({ onStarter }: { onStarter: (text: string) => void }) {
@@ -462,10 +489,8 @@ function RefinementCanvas({ direction, image, isGenerating, onBack, onShowPrompt
 
 function WorkingIntentPanel({ intent, onUpdate, selectedDirection, lockedTraits, onToggleLock }: { intent: WorkingIntent; onUpdate: (key: string, index: number | undefined, value?: string) => void; selectedDirection?: CreativeDirection; lockedTraits: string[]; onToggleLock: (trait: string) => void }) {
   const entries = intentEntries(intent);
-  return <section className="rounded-3xl border border-black/10 bg-[#fffdf8] p-4"><div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.16em] text-black/40">Working intent</p><h2 className="mt-1 font-display text-xl">What I believe you’re making</h2></div><Pencil className="h-4 w-4 text-black/30" /></div>{entries.length ? <div className="mt-4 space-y-1.5">{entries.map((entry) => <div key={entry.id} className="group flex items-start gap-2 rounded-xl bg-[#f3f0ea] px-3 py-2"><input defaultValue={entry.value} onBlur={(event) => { if (event.target.value !== entry.value) onUpdate(entry.key, entry.index, event.target.value); }} aria-label={`Edit ${entry.key}`} className="min-w-0 flex-1 bg-transparent text-xs leading-5 outline-none focus:underline" /><button onClick={() => onUpdate(entry.key, entry.index)} aria-label={`Remove ${entry.key}`} className="mt-1 opacity-30 transition hover:opacity-100"><X className="h-3 w-3" /></button></div>)}</div> : <p className="mt-3 text-sm leading-6 text-black/45">Your interpretation will appear here as you add context.</p>}{selectedDirection && <div className="mt-4 border-t border-black/10 pt-4"><p className="mb-2 text-[10px] font-semibold uppercase tracking-[.16em] text-black/40">Lock decisions</p><div className="flex flex-wrap gap-1.5">{lockableTraits.filter((trait) => trait === "requiredText" ? intent.requiredText : selectedDirection.keyDecisions[trait as keyof typeof selectedDirection.keyDecisions]).map((trait) => { const locked = lockedTraits.includes(trait); return <button key={trait} onClick={() => onToggleLock(trait)} aria-pressed={locked} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] ${locked ? "border-[#d85432] bg-[#fff1ec] text-[#a9361e]" : "border-black/10 text-black/50"}`}>{locked ? <Lock className="h-3 w-3" /> : <LockOpen className="h-3 w-3" />}{trait.replace("visualLanguage", "visual language")}</button>; })}</div></div>}</section>;
+  return <section id="intent-panel" role="tabpanel" aria-labelledby="intent-tab" className="h-[clamp(360px,52vh,480px)] overflow-y-auto rounded-3xl border border-black/10 bg-[#fffdf8] p-4"><div className="flex items-center justify-between"><h2 className="font-display text-xl">What I believe you’re making</h2><Pencil className="h-4 w-4 text-black/30" /></div>{entries.length ? <div className="mt-4 space-y-1.5">{entries.map((entry) => <div key={entry.id} className="group flex items-start gap-2 rounded-xl bg-[#f3f0ea] px-3 py-2"><input defaultValue={entry.value} onBlur={(event) => { if (event.target.value !== entry.value) onUpdate(entry.key, entry.index, event.target.value); }} aria-label={`Edit ${entry.key}`} className="min-w-0 flex-1 bg-transparent text-xs leading-5 outline-none focus:underline" /><button onClick={() => onUpdate(entry.key, entry.index)} aria-label={`Remove ${entry.key}`} className="mt-1 opacity-30 transition hover:opacity-100"><X className="h-3 w-3" /></button></div>)}</div> : <p className="mt-3 text-sm leading-6 text-black/45">Your interpretation will appear here as you add context.</p>}{selectedDirection && <div className="mt-4 border-t border-black/10 pt-4"><p className="mb-2 text-[10px] font-semibold uppercase tracking-[.16em] text-black/40">Lock decisions</p><div className="flex flex-wrap gap-1.5">{lockableTraits.filter((trait) => trait === "requiredText" ? intent.requiredText : selectedDirection.keyDecisions[trait as keyof typeof selectedDirection.keyDecisions]).map((trait) => { const locked = lockedTraits.includes(trait); return <button key={trait} onClick={() => onToggleLock(trait)} aria-pressed={locked} className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] ${locked ? "border-[#d85432] bg-[#fff1ec] text-[#a9361e]" : "border-black/10 text-black/50"}`}>{locked ? <Lock className="h-3 w-3" /> : <LockOpen className="h-3 w-3" />}{trait.replace("visualLanguage", "visual language")}</button>; })}</div></div>}</section>;
 }
-
-function GuidancePreference({ value, onChange }: { value: GuidancePreference; onChange: (value: GuidancePreference) => void }) { return <section className="rounded-2xl border border-black/10 bg-white/50 p-2"><p className="sr-only">Guidance preference</p><div className="grid grid-cols-3 gap-1">{(["create", "guide", "teach"] as const).map((option) => <button key={option} onClick={() => onChange(option)} aria-pressed={value === option} className={`rounded-xl px-2 py-2 text-xs font-medium capitalize transition ${value === option ? "bg-[#24211d] text-white" : "text-black/45 hover:bg-white"}`}>{option}</button>)}</div></section>; }
 
 function GuidanceCard({ direction, teach }: { direction: CreativeDirection; teach: boolean }) { return <section className="rounded-2xl border border-[#d85432]/20 bg-[#fff7f2] p-4"><p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[.14em] text-[#a9361e]"><Lightbulb className="h-4 w-4" />{teach ? "Why this works" : "Creative guidance"}</p><p className="mt-2 text-sm leading-6">{direction.emotionalEffect}</p><p className="mt-3 text-xs leading-5 text-black/55"><strong>Tradeoff:</strong> {direction.tradeoffs[0]}</p></section>; }
 
