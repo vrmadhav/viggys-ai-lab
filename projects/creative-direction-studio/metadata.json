@@ -1,0 +1,16 @@
+{
+  "title": "Creative Direction Studio",
+  "slug": "creative-direction-studio",
+  "status": "in-progress",
+  "dateCreated": "2026-07-21",
+  "dateUpdated": "2026-07-21",
+  "description": "A canvas-led AI workspace for developing a visual idea before it becomes an image prompt.",
+  "summary": "Start with a feeling, constraint, reference, or half-formed thought. Compare three genuinely different visual strategies, then lock decisions, refine, and branch through image revisions.",
+  "image": "/experiments/creative-direction-studio.svg",
+  "featured": true,
+  "tags": ["AI", "Creative Direction", "Images", "Design"],
+  "links": {
+    "demo": "/apps/creative-direction-studio"
+  }
+}
+

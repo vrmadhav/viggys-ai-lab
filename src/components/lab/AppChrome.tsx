@@ -3,7 +3,10 @@
 import { usePathname } from "next/navigation";
 import { AmbientBg } from "@/components/lab/AmbientBg";
 
-const routesWithoutAmbientBg = new Set(["/apps/world-cup-bracket"]);
+const routesWithoutAmbientBg = new Set([
+  "/apps/world-cup-bracket",
+  "/apps/creative-direction-studio",
+]);
 
 export function AppChrome() {
   const pathname = usePathname();
